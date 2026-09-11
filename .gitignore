@@ -1,0 +1,55 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# MERIDIAN — Multi-Tenant Logistics Platform
+# Phase 1 · Git ignore rules
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Dependencies
+node_modules/
+.pnp/
+.pnp.*
+
+# Environment files — NEVER commit real environment values.
+# Only .env.example (placeholders only) belongs in Git.
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+
+# Next.js build output
+.next/
+out/
+
+# Production builds
+build/
+dist/
+
+# Test / coverage output
+coverage/
+
+# Logs (pino writes JSON logs in production — never commit them)
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# MongoDB local data / replica-set artifacts (if ever run inside the repo)
+data/db/
+mongod.lock
+*.bson
+
+# Runtime / process files
+*.pid
+*.seed
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# TypeScript incremental cache
+*.tsbuildinfo
+next-env.d.ts

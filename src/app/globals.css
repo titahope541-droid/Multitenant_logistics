@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+/* ──────────────────────────────────────────────────────────────────────────
+   MERIDIAN — Design tokens (Phase 1)
+   Logistics-grade dark system: ink surfaces, hairline structure, one signal
+   accent used sparingly, semantic tones reserved for operational status.
+   ────────────────────────────────────────────────────────────────────────── */
+
+@theme {
+  --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), ui-monospace, "SF Mono", monospace;
+
+  --color-ink: #05080d; /* page background */
+  --color-panel: #090e15; /* raised surface */
+  --color-panel-2: #0d141d; /* hover / deep panel */
+  --color-line: #1a2431; /* hairlines */
+  --color-line-strong: #2b3949;
+
+  --color-paper: #edf2f7; /* primary text */
+  --color-fog: #8e9aac; /* secondary text */
+  --color-dim: #55647a; /* tertiary text / labels */
+
+  --color-signal: #ff5c1a; /* the single accent */
+  --color-signal-hot: #ff7438;
+
+  --color-mint: #3ddc97; /* healthy */
+  --color-amber: #ffb224; /* degraded / planned */
+  --color-crimson: #ff4d5e; /* down / danger */
+
+  --animate-marquee: marquee 46s linear infinite;
+  --animate-pulse-soft: pulse-soft 2.4s ease-in-out infinite;
+  --animate-rise: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes pulse-soft {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.35;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Subtle dotted survey-grid backdrop. */
+@utility dotgrid {
+  background-image: radial-gradient(var(--color-line-strong) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Fade edges for marquees and tickers. */
+@utility edge-fade {
+  mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-ink font-sans text-paper antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--color-signal);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 3px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-ink);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line-strong);
+    border: 3px solid var(--color-ink);
+    border-radius: 8px;
+  }
+}
+
+/* Leaflet marker pin — brand-driven, asset-free (no icon images needed). */
+.meridian-map-pin {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--brand, #0b5fff);
+  border: 3px solid #ffffff;
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--brand, #0b5fff) 35%, transparent),
+    0 2px 6px rgb(0 0 0 / 0.35);
+}
+
+.leaflet-container {
+  font: inherit;
+  background: #e8edf2;
+}
+
+.leaflet-control-attribution {
+  font-size: 10px;
+}
