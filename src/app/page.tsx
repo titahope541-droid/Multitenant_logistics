@@ -66,7 +66,7 @@ export default async function HomePage() {
   if (resolution.kind === "unknown") return <SiteUnavailable reason="not-found" />;
   if (resolution.kind === "platform") {
     return (
-      <div className="relative min-h-screen overflow-x-clip">
+      <div className="relative min-h-screen overflow-x-clip bg-ink text-paper">
         <Nav />
         <DevPortal />
         <Footer />

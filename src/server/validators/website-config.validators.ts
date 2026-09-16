@@ -34,8 +34,25 @@ const plainText = (max: number) =>
 const cardItemSchema = z
   .object({
     title: freeText(80).refine(noMarkup, { message: "must not contain markup" }),
+    label: plainText(40).optional(),
     description: plainText(400).optional(),
     icon: z.enum(WEBSITE_ICONS).optional(),
+    imageUrl: httpUrlSchema.optional(),
+    visible: z.boolean().default(true),
+  })
+  .strict();
+
+const stepItemSchema = z
+  .object({
+    title: freeText(80).refine(noMarkup, { message: "must not contain markup" }),
+    description: plainText(300).optional(),
+  })
+  .strict();
+
+const faqItemSchema = z
+  .object({
+    question: freeText(160).refine(noMarkup, { message: "must not contain markup" }),
+    answer: plainText(1000),
     visible: z.boolean().default(true),
   })
   .strict();
@@ -116,6 +133,22 @@ export const websiteUpdateSchema = z
             heading: plainText(120).optional(),
             subtext: plainText(300).optional(),
             ctaLabel: plainText(40).optional(),
+          })
+          .strict()
+          .optional(),
+        howItWorks: z
+          .object({
+            enabled: z.boolean().optional(),
+            title: plainText(80).optional(),
+            steps: z.array(stepItemSchema).max(WEBSITE_LIMITS.steps).optional(),
+          })
+          .strict()
+          .optional(),
+        faq: z
+          .object({
+            enabled: z.boolean().optional(),
+            title: plainText(80).optional(),
+            items: z.array(faqItemSchema).max(WEBSITE_LIMITS.faq).optional(),
           })
           .strict()
           .optional(),

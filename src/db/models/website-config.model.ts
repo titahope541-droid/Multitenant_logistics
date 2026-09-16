@@ -17,8 +17,10 @@ import { EMAIL_PATTERN, HEX_COLOR_PATTERN, HTTP_URL_PATTERN } from "@/lib/valida
 import {
   BUTTON_STYLES,
   DEFAULT_BRANDING,
+  DEFAULT_FAQ,
   DEFAULT_HERO_CTA_HREF,
   DEFAULT_HERO_CTA_LABEL,
+  DEFAULT_HOW_IT_WORKS,
   DEFAULT_NAVIGATION,
   DEFAULT_SECTION_ORDER,
   DEFAULT_TRACKING_SECTION,
@@ -57,8 +59,23 @@ export interface NavigationItemDoc {
 
 export interface CardItemDoc {
   title: string;
+  /** Small category chip, e.g. "Local". */
+  label?: string;
   description?: string;
   icon?: WebsiteIcon;
+  /** URL-based imagery only — there is no upload system. */
+  imageUrl?: string;
+  visible?: boolean;
+}
+
+export interface StepItemDoc {
+  title: string;
+  description?: string;
+}
+
+export interface FaqItemDoc {
+  question: string;
+  answer: string;
   visible?: boolean;
 }
 
@@ -68,6 +85,8 @@ export interface SectionsDoc {
   about: { enabled: boolean; title?: string; text?: string; imageUrl?: string };
   features: { enabled: boolean; title?: string; items: CardItemDoc[] };
   tracking: { enabled: boolean; heading?: string; subtext?: string; ctaLabel?: string };
+  howItWorks: { enabled: boolean; title?: string; steps: StepItemDoc[] };
+  faq: { enabled: boolean; title?: string; items: FaqItemDoc[] };
   contact: { enabled: boolean; hours?: string };
   footer: { enabled: boolean; text?: string; showNavigation?: boolean; showSocial?: boolean };
 }
@@ -128,8 +147,27 @@ const navigationItemSchema = new Schema<NavigationItemDoc>(
 const cardItemSchema = new Schema<CardItemDoc>(
   {
     title: { type: String, required: true, trim: true, maxlength: 80 },
+    label: { type: String, trim: true, maxlength: 40 },
     description: { type: String, trim: true, maxlength: 400 },
     icon: { type: String, enum: { values: [...WEBSITE_ICONS] } },
+    imageUrl: { type: String, trim: true, maxlength: 500, match: url },
+    visible: { type: Boolean, default: true },
+  },
+  { _id: false },
+);
+
+const stepItemSchema = new Schema<StepItemDoc>(
+  {
+    title: { type: String, required: true, trim: true, maxlength: 80 },
+    description: { type: String, trim: true, maxlength: 300 },
+  },
+  { _id: false },
+);
+
+const faqItemSchema = new Schema<FaqItemDoc>(
+  {
+    question: { type: String, required: true, trim: true, minlength: 5, maxlength: 160 },
+    answer: { type: String, required: true, trim: true, maxlength: 1000 },
     visible: { type: Boolean, default: true },
   },
   { _id: false },
@@ -200,6 +238,42 @@ const sectionsSchema = new Schema<SectionsDoc>(
           heading: { type: String, trim: true, maxlength: 120, default: DEFAULT_TRACKING_SECTION.heading },
           subtext: { type: String, trim: true, maxlength: 300, default: DEFAULT_TRACKING_SECTION.subtext },
           ctaLabel: { type: String, trim: true, maxlength: 40, default: DEFAULT_TRACKING_SECTION.ctaLabel },
+        },
+        { _id: false },
+      ),
+      default: () => ({ enabled: true }),
+    },
+    howItWorks: {
+      type: new Schema(
+        {
+          enabled: { type: Boolean, default: true },
+          title: { type: String, trim: true, maxlength: 80, default: DEFAULT_HOW_IT_WORKS.title },
+          steps: {
+            type: [stepItemSchema],
+            default: () => DEFAULT_HOW_IT_WORKS.steps.map((step) => ({ ...step })),
+            validate: {
+              validator: (steps: StepItemDoc[]) => steps.length <= WEBSITE_LIMITS.steps,
+              message: `howItWorks supports at most ${WEBSITE_LIMITS.steps} steps`,
+            },
+          },
+        },
+        { _id: false },
+      ),
+      default: () => ({ enabled: true }),
+    },
+    faq: {
+      type: new Schema(
+        {
+          enabled: { type: Boolean, default: true },
+          title: { type: String, trim: true, maxlength: 80, default: DEFAULT_FAQ.title },
+          items: {
+            type: [faqItemSchema],
+            default: () => DEFAULT_FAQ.items.map((item) => ({ ...item })),
+            validate: {
+              validator: (items: FaqItemDoc[]) => items.length <= WEBSITE_LIMITS.faq,
+              message: `faq supports at most ${WEBSITE_LIMITS.faq} entries`,
+            },
+          },
         },
         { _id: false },
       ),

@@ -35,13 +35,13 @@ export default async function TenantPreviewPage({
 
   return (
     <div>
-      <div className="sticky top-0 z-[60] flex flex-wrap items-center justify-between gap-3 border-b border-line bg-ink px-5 py-2.5">
-        <span className="font-mono text-[10px] tracking-[0.25em] text-signal uppercase">
+      <div className="sticky top-0 z-[60] flex flex-wrap items-center justify-between gap-3 border-b border-hair bg-surface px-5 py-3">
+        <span className="text-[12.5px] font-medium text-accent">
           Preview — {details.tenant.companyName} · status {details.tenant.status}
         </span>
         <Link
           href={`/admin/tenants/${tenantId}`}
-          className="inline-flex items-center gap-2 border border-line px-3 py-1.5 font-mono text-[9.5px] tracking-[0.15em] text-fog uppercase transition-colors hover:border-paper/40 hover:text-paper"
+          className="inline-flex items-center gap-2 rounded-lg border border-hair-strong bg-surface px-3 py-1.5 text-[12.5px] font-medium text-slate transition-colors hover:border-muted"
         >
           <ArrowLeft className="h-3 w-3" /> Back to editor
         </Link>

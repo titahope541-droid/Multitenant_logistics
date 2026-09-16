@@ -19,6 +19,7 @@ import "next/dist/server/node-environment-baseline";
 
 import { createServer } from "node:http";
 import next from "next";
+import { connectToDatabase } from "@/db";
 import { getSocketServer } from "@/server/realtime/registry";
 import { attachSocketServer } from "@/server/realtime/socket-server";
 import { getLogger } from "@/server/utils/logger";
@@ -33,6 +34,13 @@ async function main(): Promise<void> {
   const app = next({ dev, hostname, port });
   const handle = app.getRequestHandler();
   await app.prepare();
+
+  // Open the MongoDB pool before serving. Failure is non-fatal: the
+  // process still boots so /api/health answers and /api/ready reports
+  // the dependency as down (docs/deployment.md §lifecycle).
+  await connectToDatabase().catch((error: unknown) => {
+    log.error({ err: error }, "initial mongodb connection failed — continuing, readiness will report down");
+  });
 
   const server = createServer((req, res) => handle(req, res));
 

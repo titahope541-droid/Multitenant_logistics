@@ -1,21 +1,51 @@
 import type { Metadata } from "next";
-import { AccountForm } from "@/components/tenant/account-form";
+import { ChangePasswordForm } from "@/components/account/change-password-form";
+import { Card, PageHeader, SectionCard } from "@/components/ui";
+import { TenantModel } from "@/db/models/tenant.model";
 import { requirePageRole } from "@/server/middleware/page-auth";
 
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Account" };
 
 export default async function TenantAccountPage() {
   const auth = await requirePageRole("TENANT_ADMIN");
+  const tenant = auth.user.tenantId
+    ? await TenantModel.findById(auth.user.tenantId).lean()
+    : null;
+
+  const rows = [
+    { label: "Name", value: auth.user.name },
+    { label: "Email", value: auth.user.email },
+    { label: "Company", value: tenant?.companyName ?? "—" },
+    { label: "Role", value: "Tenant admin" },
+  ];
+
   return (
-    <div className="max-w-xl">
-      <p className="mb-2 font-mono text-[10px] tracking-[0.3em] text-signal uppercase">
-        Account — security
-      </p>
-      <h1 className="text-3xl font-bold tracking-[-0.02em] text-paper">{auth.user.name}</h1>
-      <p className="mt-2 mb-8 font-mono text-[12px] text-dim">
-        {auth.user.email} · {auth.user.role}
-      </p>
-      <AccountForm />
-    </div>
+    <>
+      <PageHeader title="Account" description="Your profile and sign-in security." />
+
+      <div className="grid gap-5 lg:grid-cols-2">
+        <Card>
+          <div className="border-b border-hair px-5 py-4 sm:px-6">
+            <h2 className="text-[15px] font-semibold text-slate">Profile</h2>
+          </div>
+          <dl className="divide-y divide-hair">
+            {rows.map((row) => (
+              <div key={row.label} className="flex items-center justify-between gap-4 px-5 py-3.5 sm:px-6">
+                <dt className="text-[13px] text-muted">{row.label}</dt>
+                <dd className="truncate text-[13.5px] font-medium text-slate">{row.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </Card>
+
+        <SectionCard
+          title="Change password"
+          description="Updating your password signs out every other session."
+        >
+          <ChangePasswordForm />
+        </SectionCard>
+      </div>
+    </>
   );
 }

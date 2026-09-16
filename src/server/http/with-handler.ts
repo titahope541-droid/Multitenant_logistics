@@ -14,6 +14,7 @@
  */
 
 import type { NextRequest, NextResponse } from "next/server";
+import { connectToDatabase } from "@/db";
 import { ApiError, apiErrors } from "@/server/http/errors";
 import { fail } from "@/server/http/respond";
 import {
@@ -39,6 +40,10 @@ export function withHandler<C = unknown>(handler: RouteHandler<C>): RouteHandler
   return async (request, context) => {
     let response: NextResponse;
     try {
+      // Idempotent + cached: guarantees the pool exists for this runtime
+      // even when the process never served a health probe first.
+      await connectToDatabase().catch(() => undefined);
+
       // 1 — rate limit (single-process baseline; shared store in Phase 10)
       const key = clientRateLimitKey(request);
       const rateLimit = checkRateLimit(key);

@@ -19,13 +19,15 @@ per-tenant code).
 | `branding` | logoUrl, faviconUrl, primaryColor, secondaryColor, accentColor, backgroundColor, textColor, fontFamily, buttonStyle (`square`/`rounded`/`pill`), borderRadius (0–32), theme (`light`/`dark`), tagline |
 | `navigation[≤10]` | label, href, visible |
 | `sections.hero` | enabled, headline, subtext, ctaLabel, ctaHref, imageUrl |
-| `sections.services` | enabled, title, items[≤8]{title, description, icon, visible} |
+| `sections.services` | enabled, title, items[≤8]{title, label?, description?, icon?, imageUrl?, visible} |
 | `sections.about` | enabled, title, text, imageUrl |
 | `sections.features` | enabled, title, items[≤8]{…} (“Why choose us”) |
 | `sections.tracking` | enabled, heading, subtext, ctaLabel |
+| `sections.howItWorks` | enabled, title, steps[≤5]{title, description} — default copy describes the real tracking flow |
+| `sections.faq` | enabled, title, items[≤12]{question, answer, visible} — defaults describe real platform behaviour |
 | `sections.contact` | enabled, hours (+ phone/email/address on `contact`) |
 | `sections.footer` | enabled, text, showNavigation, showSocial |
-| `sectionOrder` | permutation of hero · services · about · features · tracking · contact |
+| `sectionOrder` | permutation of hero · services · about · features · howItWorks · tracking · faq · contact |
 | `socialLinks[≤8]` | platform (free text), url |
 | `seo` | title, description, ogTitle, ogDescription, ogImageUrl |
 
@@ -42,6 +44,25 @@ Branding becomes CSS variables (`--brand`, `--brand-ink`, `--brand-accent`,
 `--brand-soft`, `--brand-radius`) plus background/text/font on the root —
 no tenant-specific CSS, no style injection (values are validated hex /
 enums / bounded numbers).
+
+### Landing-page additions (latest UI phase)
+
+Two optional sections were added to the SAME `website_configs` document —
+no new collection, no second configuration system:
+
+* **How it works** — up to five numbered steps. Defaults describe the real
+  tracking experience (receive ID → enter it → follow the shipment); no
+  invented claims.
+* **FAQ** — up to twelve question/answer pairs in an accessible accordion.
+  Defaults answer tracking questions accurately (how to track, what the
+  five statuses mean, why a status may not have changed).
+
+Service/feature cards also gained optional `label` (category chip) and
+`imageUrl` (URL-based imagery only). All additions are optional with
+defaults, so existing tenants render unchanged except for two new sections
+appearing at their default positions — order normalization inserts newly
+added sections at their default position rather than appending them last.
+Both are editable from the Platform Admin Website tab.
 
 ## 3 · Section visibility & ordering
 

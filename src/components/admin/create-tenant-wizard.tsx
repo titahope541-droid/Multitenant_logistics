@@ -1,27 +1,26 @@
 "use client";
 
 /**
- * Tenant provisioning wizard — Step 1 Company → Step 2 Tenant Admin →
- * Step 3 Website/summary. Submits ONE atomic request; all validation,
- * transactions, hashing, and uniqueness enforcement happen server-side.
+ * Tenant provisioning wizard — Company → Tenant admin → Initialize website.
+ * One atomic request; all validation, transactions, hashing and uniqueness
+ * enforcement happen server-side.
  */
 
 import { useMemo, useState, type FormEvent } from "react";
-import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import { CredentialsDisplay } from "@/components/admin/credentials-display";
+import {
+  Button,
+  Card,
+  ErrorNote,
+  Field,
+  Input,
+  buttonClasses,
+} from "@/components/ui";
 import { ApiClientError } from "@/services/api-client";
 import { createTenant, type CreateTenantPayload } from "@/services/tenants";
-import { CredentialsDisplay } from "@/components/admin/credentials-display";
+import { cn } from "@/lib/utils";
 import type { TenantCreationResult } from "@/types/tenant";
-
-function suggestSlug(companyName: string): string {
-  return companyName
-    .toLowerCase()
-    .trim()
-    .replace(/[\s_]+/g, "-")
-    .replace(/[^a-z0-9-]/g, "")
-    .replace(/-{2,}/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
 
 const STEPS = ["Company", "Tenant admin", "Initialize website"] as const;
 
@@ -36,7 +35,7 @@ interface Draft {
   adminPassword: string;
 }
 
-const EMPTY_DRAFT: Draft = {
+const EMPTY: Draft = {
   companyName: "",
   slug: "",
   phone: "",
@@ -47,15 +46,25 @@ const EMPTY_DRAFT: Draft = {
   adminPassword: "",
 };
 
+function suggestSlug(companyName: string): string {
+  return companyName
+    .toLowerCase()
+    .trim()
+    .replace(/[\s_]+/g, "-")
+    .replace(/[^a-z0-9-]/g, "")
+    .replace(/-{2,}/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export function CreateTenantWizard({ onCreated }: { onCreated: () => void }) {
   const [step, setStep] = useState(0);
-  const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
+  const [draft, setDraft] = useState<Draft>(EMPTY);
   const [slugTouched, setSlugTouched] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<TenantCreationResult | null>(null);
 
-  const effectiveSlug = useMemo(
+  const slug = useMemo(
     () => (slugTouched ? draft.slug : suggestSlug(draft.companyName)),
     [draft.companyName, draft.slug, slugTouched],
   );
@@ -64,7 +73,7 @@ export function CreateTenantWizard({ onCreated }: { onCreated: () => void }) {
     setDraft((current) => ({ ...current, [key]: value }));
   }
 
-  function buildPayload(): CreateTenantPayload {
+  function payload(): CreateTenantPayload {
     const contact = {
       ...(draft.phone.trim() ? { phone: draft.phone.trim() } : {}),
       ...(draft.companyEmail.trim() ? { email: draft.companyEmail.trim() } : {}),
@@ -72,7 +81,7 @@ export function CreateTenantWizard({ onCreated }: { onCreated: () => void }) {
     };
     return {
       companyName: draft.companyName.trim(),
-      slug: effectiveSlug,
+      slug,
       ...(Object.keys(contact).length > 0 ? { contact } : {}),
       admin: {
         name: draft.adminName.trim(),
@@ -91,13 +100,12 @@ export function CreateTenantWizard({ onCreated }: { onCreated: () => void }) {
     setBusy(true);
     setError(null);
     try {
-      const result = await createTenant(buildPayload());
-      setCreated(result);
-      setDraft(EMPTY_DRAFT);
+      setCreated(await createTenant(payload()));
+      setDraft(EMPTY);
       setSlugTouched(false);
       onCreated();
     } catch (cause) {
-      setError(cause instanceof ApiClientError ? cause.message : "Unexpected error.");
+      setError(cause instanceof ApiClientError ? cause.message : "Could not create the tenant.");
     } finally {
       setBusy(false);
     }
@@ -105,168 +113,203 @@ export function CreateTenantWizard({ onCreated }: { onCreated: () => void }) {
 
   if (created) {
     return (
-      <div className="border border-line bg-panel p-5 sm:p-6">
+      <Card className="p-5 sm:p-6">
         <CredentialsDisplay
-          title="Tenant provisioned — one-time credentials"
+          title="Tenant provisioned"
           rows={[
-            { label: "company", value: created.tenant.companyName },
-            { label: "subdomain", value: `${created.tenant.slug}.yourplatform.com` },
-            { label: "admin email", value: created.admin.email },
+            { label: "Company", value: created.tenant.companyName },
+            { label: "Subdomain", value: created.tenant.slug },
+            { label: "Admin email", value: created.admin.email },
           ]}
           temporaryPassword={
-            created.temporaryPassword ?? "(set by you during creation — not stored, not shown)"
+            created.temporaryPassword ?? "(set by you during creation — not stored)"
           }
         />
         <button
-          onClick={() => setCreated(null)}
-          className="mt-4 border border-line px-4 py-2 font-mono text-[10px] tracking-[0.2em] text-fog uppercase transition-colors hover:border-paper/40 hover:text-paper"
+          type="button"
+          onClick={() => {
+            setCreated(null);
+            setStep(0);
+          }}
+          className={cn(buttonClasses("secondary"), "mt-5")}
         >
           Create another tenant
         </button>
-      </div>
+      </Card>
     );
   }
 
-  const inputClass =
-    "w-full border border-line bg-ink px-3.5 py-2.5 text-sm text-paper outline-none transition-colors placeholder:text-dim/60 focus:border-signal";
-  const labelClass = "mb-1.5 block font-mono text-[10px] tracking-[0.2em] text-dim uppercase";
-
   return (
-    <div className="border border-line bg-panel">
-      <div className="flex items-center gap-1 border-b border-line px-5 py-3">
+    <Card>
+      {/* Stepper */}
+      <ol className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-hair px-5 py-4 sm:px-6">
         {STEPS.map((label, index) => (
-          <span key={label} className="flex items-center">
+          <li key={label} className="flex items-center gap-2">
             <span
-              className={`font-mono text-[10px] tracking-[0.18em] uppercase ${
-                index === step ? "text-signal" : index < step ? "text-fog" : "text-dim"
-              }`}
+              className={cn(
+                "flex h-6 w-6 items-center justify-center rounded-full text-[11.5px] font-semibold",
+                index === step
+                  ? "bg-accent text-white"
+                  : index < step
+                    ? "bg-ok-soft text-ok"
+                    : "bg-surface-2 text-muted",
+              )}
+              aria-hidden="true"
             >
-              {index + 1}. {label}
+              {index < step ? <Check className="h-3.5 w-3.5" /> : index + 1}
             </span>
-            {index < STEPS.length - 1 ? <span className="mx-3 text-dim">→</span> : null}
-          </span>
+            <span
+              className={cn(
+                "text-[13px]",
+                index === step ? "font-semibold text-slate" : "text-muted",
+              )}
+            >
+              {label}
+            </span>
+          </li>
         ))}
-      </div>
+      </ol>
 
-      <form onSubmit={onSubmit} className="space-y-4 p-5 sm:p-6">
+      <form onSubmit={onSubmit} className="space-y-4 px-5 py-5 sm:px-6">
         {step === 0 ? (
           <>
-            <label className="block">
-              <span className={labelClass}>Company name *</span>
-              <input required value={draft.companyName} onChange={(e) => set("companyName", e.target.value)} placeholder="Swift Logistics Ltd." className={inputClass} />
-            </label>
-            <label className="block">
-              <span className={labelClass}>Subdomain *</span>
-              <div className="flex items-center gap-2">
-                <input
-                  required
-                  value={effectiveSlug}
-                  onChange={(e) => {
-                    setSlugTouched(true);
-                    set("slug", e.target.value);
-                  }}
-                  placeholder="swift-logistics"
-                  className={inputClass}
-                />
-                <span className="font-mono text-[11px] whitespace-nowrap text-dim">.yourplatform.com</span>
-              </div>
-            </label>
+            <Field label="Company name" htmlFor="company-name" required>
+              <Input
+                id="company-name"
+                required
+                value={draft.companyName}
+                onChange={(event) => set("companyName", event.target.value)}
+                placeholder="Swift Logistics Ltd."
+              />
+            </Field>
+            <Field
+              label="Subdomain"
+              htmlFor="company-slug"
+              hint="Becomes the tenant's public address."
+              required
+            >
+              <Input
+                id="company-slug"
+                required
+                value={slug}
+                onChange={(event) => {
+                  setSlugTouched(true);
+                  set("slug", event.target.value);
+                }}
+                placeholder="swift-logistics"
+              />
+            </Field>
             <div className="grid gap-4 sm:grid-cols-2">
-              <label className="block">
-                <span className={labelClass}>Company phone</span>
-                <input value={draft.phone} onChange={(e) => set("phone", e.target.value)} placeholder="+234 …" className={inputClass} />
-              </label>
-              <label className="block">
-                <span className={labelClass}>Company email</span>
-                <input type="email" value={draft.companyEmail} onChange={(e) => set("companyEmail", e.target.value)} placeholder="ops@swift.com" className={inputClass} />
-              </label>
+              <Field label="Company phone" htmlFor="company-phone">
+                <Input
+                  id="company-phone"
+                  value={draft.phone}
+                  onChange={(event) => set("phone", event.target.value)}
+                />
+              </Field>
+              <Field label="Company email" htmlFor="company-email">
+                <Input
+                  id="company-email"
+                  type="email"
+                  value={draft.companyEmail}
+                  onChange={(event) => set("companyEmail", event.target.value)}
+                />
+              </Field>
             </div>
-            <label className="block">
-              <span className={labelClass}>Address</span>
-              <input value={draft.address} onChange={(e) => set("address", e.target.value)} placeholder="21 Marina Rd, Lagos" className={inputClass} />
-            </label>
+            <Field label="Address" htmlFor="company-address">
+              <Input
+                id="company-address"
+                value={draft.address}
+                onChange={(event) => set("address", event.target.value)}
+              />
+            </Field>
           </>
         ) : null}
 
         {step === 1 ? (
           <>
-            <label className="block">
-              <span className={labelClass}>Admin name *</span>
-              <input required value={draft.adminName} onChange={(e) => set("adminName", e.target.value)} placeholder="Adaeze Okafor" className={inputClass} />
-            </label>
-            <label className="block">
-              <span className={labelClass}>Admin email *</span>
-              <input required type="email" value={draft.adminEmail} onChange={(e) => set("adminEmail", e.target.value)} placeholder="adaeze@swift.com" className={inputClass} />
-            </label>
-            <label className="block">
-              <span className={labelClass}>Temporary password (optional)</span>
-              <input
-                value={draft.adminPassword}
-                onChange={(e) => set("adminPassword", e.target.value)}
-                placeholder="Leave empty — the server generates one"
-                className={inputClass}
+            <Field label="Admin name" htmlFor="admin-name" required>
+              <Input
+                id="admin-name"
+                required
+                value={draft.adminName}
+                onChange={(event) => set("adminName", event.target.value)}
               />
-            </label>
-            <p className="font-mono text-[10px] leading-4 text-dim">
-              Exactly one tenant admin is created per tenant. The password is
-              Argon2id-hashed server-side; if left empty, a secure temporary
-              password is generated and shown to you once.
+            </Field>
+            <Field label="Admin email" htmlFor="admin-email" required>
+              <Input
+                id="admin-email"
+                type="email"
+                required
+                value={draft.adminEmail}
+                onChange={(event) => set("adminEmail", event.target.value)}
+              />
+            </Field>
+            <Field
+              label="Temporary password"
+              htmlFor="admin-password"
+              hint="Leave empty and the server generates one, shown to you once."
+            >
+              <Input
+                id="admin-password"
+                value={draft.adminPassword}
+                onChange={(event) => set("adminPassword", event.target.value)}
+                placeholder="Generated automatically"
+              />
+            </Field>
+            <p className="text-[12.5px] text-muted">
+              Exactly one tenant admin is created per company. The password is hashed with
+              Argon2id and is never retrievable.
             </p>
           </>
         ) : null}
 
         {step === 2 ? (
-          <div className="space-y-3 font-mono text-[12px] leading-6">
-            <p className="text-[10px] tracking-[0.2em] text-dim uppercase">Review & provision</p>
-            <p className="text-paper">
-              {draft.companyName || "—"} <span className="text-dim">→</span>{" "}
-              <span className="text-signal">{effectiveSlug || "—"}.yourplatform.com</span>
+          <div className="space-y-3 text-[13.5px] leading-6">
+            <p className="text-[12.5px] font-medium tracking-wide text-muted uppercase">
+              Review &amp; provision
             </p>
-            <p className="text-fog">
-              admin: {draft.adminName || "—"} &lt;{draft.adminEmail || "—"}&gt;
+            <p className="text-slate">
+              <span className="font-semibold">{draft.companyName || "—"}</span>{" "}
+              <span className="text-muted">→</span>{" "}
+              <span className="font-mono text-accent">{slug || "—"}</span>
+            </p>
+            <p className="text-body">
+              Admin: {draft.adminName || "—"} &lt;{draft.adminEmail || "—"}&gt;
               {draft.adminPassword ? " · password provided" : " · password will be generated"}
             </p>
-            <p className="border-l-2 border-signal pl-3 text-[11px] leading-5 text-dim">
-              Creates, atomically: the tenant, exactly one TENANT_ADMIN user
-              (ACTIVE), and the initialized default WebsiteConfig — hero,
-              tracking, services and about sections, with your contact
-              details carried over. Branding is customized later by the
-              Platform Admin.
+            <p className="rounded-lg bg-surface-2 px-3.5 py-3 text-[13px] text-body">
+              Creates, atomically: the tenant, exactly one tenant admin, and the default website
+              configuration (hero, tracking, services and about sections) with your contact details
+              carried over. Branding is customized afterwards on the Branding tab.
             </p>
           </div>
         ) : null}
 
-        {error ? (
-          <p role="alert" className="border-l-2 border-crimson px-3 py-2 font-mono text-[11px] leading-5 text-crimson">
-            {error}
-          </p>
-        ) : null}
+        {error ? <ErrorNote>{error}</ErrorNote> : null}
 
-        <div className="flex items-center justify-between pt-2">
+        <div className="flex items-center justify-between border-t border-hair pt-4">
           <button
             type="button"
-            onClick={() => setStep((s) => Math.max(0, s - 1))}
+            onClick={() => setStep((value) => Math.max(0, value - 1))}
             disabled={step === 0 || busy}
-            className="inline-flex items-center gap-2 border border-line px-4 py-2 font-mono text-[10px] tracking-[0.2em] text-fog uppercase transition-colors hover:border-paper/40 hover:text-paper disabled:opacity-40"
+            className={buttonClasses("secondary")}
           >
-            <ArrowLeft className="h-3 w-3" /> Back
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+            Back
           </button>
-          <button
-            type="submit"
-            disabled={busy}
-            className="inline-flex items-center gap-2 border border-paper/25 bg-paper px-4 py-2 font-mono text-[10px] font-medium tracking-[0.2em] text-ink uppercase transition-colors hover:border-signal hover:bg-signal disabled:opacity-50"
-          >
-            {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+          <Button type="submit" variant="primary" loading={busy}>
             {step < 2 ? (
               <>
-                Continue <ArrowRight className="h-3 w-3" />
+                Continue
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </>
             ) : (
               "Provision tenant"
             )}
-          </button>
+          </Button>
         </div>
       </form>
-    </div>
+    </Card>
   );
 }

@@ -37,7 +37,7 @@ function CardListEditor({
   return (
     <div className="space-y-3">
       {items.map((item, index) => (
-        <div key={index} className="grid gap-3 border border-line bg-ink p-3.5 sm:grid-cols-[1fr_1fr_auto]">
+        <div key={index} className="grid gap-3 rounded-lg border border-hair bg-surface p-3.5 sm:grid-cols-[1fr_1fr_auto]">
           <label className="block">
             <Label>Title</Label>
             <input
@@ -72,7 +72,7 @@ function CardListEditor({
             <button
               type="button"
               onClick={() => update(index, { visible: !item.visible })}
-              className="mb-0.5 border border-line px-2.5 py-2 font-mono text-[9.5px] tracking-[0.15em] text-fog uppercase transition-colors hover:text-paper"
+              className="mb-0.5 border border-hair px-2.5 py-2 font-mono text-[9.5px] tracking-[0.15em] text-body uppercase transition-colors hover:text-slate"
             >
               {item.visible ? "Shown" : "Hidden"}
             </button>
@@ -80,7 +80,7 @@ function CardListEditor({
               type="button"
               onClick={() => onChange(items.filter((_, i) => i !== index))}
               aria-label={`Remove ${noun} ${index + 1}`}
-              className="mb-0.5 border border-line px-2.5 py-2 text-dim transition-colors hover:border-crimson/60 hover:text-crimson"
+              className="mb-0.5 border border-hair px-2.5 py-2 text-muted transition-colors hover:border-danger/60 hover:text-danger"
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>
@@ -91,12 +91,12 @@ function CardListEditor({
         <button
           type="button"
           onClick={() => onChange([...items, { title: `New ${noun}`, description: "", icon: "truck", visible: true }])}
-          className="inline-flex items-center gap-2 border border-line px-3.5 py-2 font-mono text-[10px] tracking-[0.18em] text-fog uppercase transition-colors hover:border-paper/40 hover:text-paper"
+          className="inline-flex items-center gap-2 border border-hair px-3.5 py-2 font-mono text-[10px] tracking-[0.18em] text-body uppercase transition-colors hover:border-paper/40 hover:text-slate"
         >
           <Plus className="h-3 w-3" /> Add {noun}
         </button>
       ) : (
-        <p className="font-mono text-[10px] text-dim">Maximum {limit} entries.</p>
+        <p className="font-mono text-[10px] text-muted">Maximum {limit} entries.</p>
       )}
     </div>
   );
@@ -158,33 +158,33 @@ export function WebsiteEditor({ tenantId, initial }: { tenantId: string; initial
       <Panel title="Sections — visibility & order">
         <ul className="space-y-2">
           {draft.sectionOrder.map((key, index) => (
-            <li key={key} className="flex items-center gap-3 border border-line bg-ink px-3.5 py-2.5">
-              <span className="font-mono text-[10px] text-dim">{String(index + 1).padStart(2, "0")}</span>
-              <span className="flex-1 text-[13px] font-medium text-paper">{SECTION_LABELS[key]}</span>
+            <li key={key} className="flex items-center gap-3 rounded-lg border border-hair bg-surface px-3.5 py-2.5">
+              <span className="font-mono text-[10px] text-muted">{String(index + 1).padStart(2, "0")}</span>
+              <span className="flex-1 text-[13px] font-medium text-slate">{SECTION_LABELS[key]}</span>
               <button
                 type="button"
                 onClick={() => patchSection(key, { enabled: !s[key].enabled } as never)}
-                className={`border px-2.5 py-1 font-mono text-[9.5px] tracking-[0.15em] uppercase transition-colors ${
-                  s[key].enabled ? "border-mint/40 text-mint" : "border-line text-dim"
+                className={`border px-2.5 py-1 text-[11.5px] font-medium transition-colors ${
+                  s[key].enabled ? "border-mint/40 text-ok" : "border-hair text-muted"
                 }`}
               >
                 {s[key].enabled ? "On" : "Off"}
               </button>
-              <button type="button" onClick={() => move(key, -1)} aria-label={`Move ${SECTION_LABELS[key]} up`} disabled={index === 0} className="border border-line p-1.5 text-dim transition-colors hover:text-paper disabled:opacity-30">
+              <button type="button" onClick={() => move(key, -1)} aria-label={`Move ${SECTION_LABELS[key]} up`} disabled={index === 0} className="border border-hair p-1.5 text-muted transition-colors hover:text-slate disabled:opacity-30">
                 <ArrowUp className="h-3 w-3" />
               </button>
-              <button type="button" onClick={() => move(key, 1)} aria-label={`Move ${SECTION_LABELS[key]} down`} disabled={index === draft.sectionOrder.length - 1} className="border border-line p-1.5 text-dim transition-colors hover:text-paper disabled:opacity-30">
+              <button type="button" onClick={() => move(key, 1)} aria-label={`Move ${SECTION_LABELS[key]} down`} disabled={index === draft.sectionOrder.length - 1} className="border border-hair p-1.5 text-muted transition-colors hover:text-slate disabled:opacity-30">
                 <ArrowDown className="h-3 w-3" />
               </button>
             </li>
           ))}
-          <li className="flex items-center gap-3 border border-dashed border-line px-3.5 py-2.5 opacity-70">
-            <span className="font-mono text-[10px] text-dim">—</span>
-            <span className="flex-1 text-[13px] text-fog">Footer (always last)</span>
+          <li className="flex items-center gap-3 border border-dashed border-hair px-3.5 py-2.5 opacity-70">
+            <span className="font-mono text-[10px] text-muted">—</span>
+            <span className="flex-1 text-[13px] text-body">Footer (always last)</span>
             <button
               type="button"
               onClick={() => patchSection("footer", { enabled: !s.footer.enabled })}
-              className={`border px-2.5 py-1 font-mono text-[9.5px] tracking-[0.15em] uppercase ${s.footer.enabled ? "border-mint/40 text-mint" : "border-line text-dim"}`}
+              className={`border px-2.5 py-1 text-[11.5px] font-medium ${s.footer.enabled ? "border-mint/40 text-ok" : "border-hair text-muted"}`}
             >
               {s.footer.enabled ? "On" : "Off"}
             </button>
@@ -260,16 +260,113 @@ export function WebsiteEditor({ tenantId, initial }: { tenantId: string; initial
             <div key={index} className="grid gap-3 sm:grid-cols-[12rem_1fr_auto]">
               <input value={link.platform} maxLength={40} aria-label="Platform" onChange={(e) => setDraft((c) => ({ ...c, socialLinks: c.socialLinks.map((l, i) => (i === index ? { ...l, platform: e.target.value } : l)) }))} className={fieldClass} />
               <input value={link.url} maxLength={300} aria-label="URL" placeholder="https://…" onChange={(e) => setDraft((c) => ({ ...c, socialLinks: c.socialLinks.map((l, i) => (i === index ? { ...l, url: e.target.value } : l)) }))} className={fieldClass} />
-              <button type="button" aria-label={`Remove social link ${index + 1}`} onClick={() => setDraft((c) => ({ ...c, socialLinks: c.socialLinks.filter((_, i) => i !== index) }))} className="border border-line px-2.5 text-dim transition-colors hover:border-crimson/60 hover:text-crimson">
+              <button type="button" aria-label={`Remove social link ${index + 1}`} onClick={() => setDraft((c) => ({ ...c, socialLinks: c.socialLinks.filter((_, i) => i !== index) }))} className="border border-hair px-2.5 text-muted transition-colors hover:border-danger/60 hover:text-danger">
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
             </div>
           ))}
           {draft.socialLinks.length < WEBSITE_LIMITS.socialLinks ? (
-            <button type="button" onClick={() => setDraft((c) => ({ ...c, socialLinks: [...c.socialLinks, { platform: "LinkedIn", url: "https://" }] }))} className="inline-flex items-center gap-2 border border-line px-3.5 py-2 font-mono text-[10px] tracking-[0.18em] text-fog uppercase transition-colors hover:border-paper/40 hover:text-paper">
+            <button type="button" onClick={() => setDraft((c) => ({ ...c, socialLinks: [...c.socialLinks, { platform: "LinkedIn", url: "https://" }] }))} className="inline-flex items-center gap-2 border border-hair px-3.5 py-2 font-mono text-[10px] tracking-[0.18em] text-body uppercase transition-colors hover:border-paper/40 hover:text-slate">
               <Plus className="h-3 w-3" /> Add social link
             </button>
           ) : null}
+        </div>
+      </Panel>
+
+      <Panel title="How it works">
+        <TextField label="Section title" value={s.howItWorks.title} maxLength={80} onChange={(v) => patchSection("howItWorks", { title: v })} />
+        <div className="mt-4 space-y-3">
+          {s.howItWorks.steps.map((step, index) => (
+            <div key={index} className="grid gap-3 rounded-lg border border-hair bg-surface p-3.5 sm:grid-cols-[1fr_1.5fr_auto]">
+              <input
+                value={step.title}
+                maxLength={80}
+                aria-label={`Step ${index + 1} title`}
+                onChange={(e) => patchSection("howItWorks", { steps: s.howItWorks.steps.map((item, i) => (i === index ? { ...item, title: e.target.value } : item)) })}
+                className={fieldClass}
+              />
+              <input
+                value={step.description ?? ""}
+                maxLength={300}
+                aria-label={`Step ${index + 1} description`}
+                onChange={(e) => patchSection("howItWorks", { steps: s.howItWorks.steps.map((item, i) => (i === index ? { ...item, description: e.target.value } : item)) })}
+                className={fieldClass}
+              />
+              <button
+                type="button"
+                aria-label={`Remove step ${index + 1}`}
+                onClick={() => patchSection("howItWorks", { steps: s.howItWorks.steps.filter((_, i) => i !== index) })}
+                className="mb-0.5 border border-hair px-2.5 text-muted transition-colors hover:border-danger/60 hover:text-danger"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ))}
+          {s.howItWorks.steps.length < 5 ? (
+            <button
+              type="button"
+              onClick={() => patchSection("howItWorks", { steps: [...s.howItWorks.steps, { title: "New step", description: "" }] })}
+              className="inline-flex items-center gap-2 rounded-lg border border-hair-strong px-3.5 py-2 text-[12.5px] font-medium text-body transition-colors hover:border-muted hover:text-slate"
+            >
+              <Plus className="h-3.5 w-3.5" /> Add step
+            </button>
+          ) : (
+            <p className="text-[12px] text-muted">Maximum 5 steps.</p>
+          )}
+        </div>
+      </Panel>
+
+      <Panel title="FAQ">
+        <TextField label="Section title" value={s.faq.title} maxLength={80} onChange={(v) => patchSection("faq", { title: v })} />
+        <div className="mt-4 space-y-3">
+          {s.faq.items.map((item, index) => (
+            <div key={index} className="space-y-3 rounded-lg border border-hair bg-surface p-3.5">
+              <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-start">
+                <input
+                  value={item.question}
+                  maxLength={160}
+                  aria-label={`Question ${index + 1}`}
+                  onChange={(e) => patchSection("faq", { items: s.faq.items.map((entry, i) => (i === index ? { ...entry, question: e.target.value } : entry)) })}
+                  className={fieldClass}
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => patchSection("faq", { items: s.faq.items.map((entry, i) => (i === index ? { ...entry, visible: !entry.visible } : entry)) })}
+                    className={`border px-2.5 py-2 text-[11.5px] font-medium transition-colors ${item.visible ? "border-ok/40 text-ok" : "border-hair text-muted"}`}
+                  >
+                    {item.visible ? "Shown" : "Hidden"}
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={`Remove question ${index + 1}`}
+                    onClick={() => patchSection("faq", { items: s.faq.items.filter((_, i) => i !== index) })}
+                    className="border border-hair px-2.5 text-muted transition-colors hover:border-danger/60 hover:text-danger"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+              <TextArea
+                label="Answer"
+                rows={3}
+                maxLength={1000}
+                value={item.answer}
+                onChange={(v) => patchSection("faq", { items: s.faq.items.map((entry, i) => (i === index ? { ...entry, answer: v } : entry)) })}
+              />
+            </div>
+          ))}
+          {s.faq.items.length < 12 ? (
+            <button
+              type="button"
+              onClick={() => patchSection("faq", { items: [...s.faq.items, { question: "New question", answer: "", visible: true }] })}
+              className="inline-flex items-center gap-2 rounded-lg border border-hair-strong px-3.5 py-2 text-[12.5px] font-medium text-body transition-colors hover:border-muted hover:text-slate"
+            >
+              <Plus className="h-3.5 w-3.5" /> Add question
+            </button>
+          ) : (
+            <p className="text-[12px] text-muted">Maximum 12 questions.</p>
+          )}
         </div>
       </Panel>
 
@@ -283,7 +380,7 @@ export function WebsiteEditor({ tenantId, initial }: { tenantId: string; initial
           <TextArea label="Open Graph description" value={draft.seo.ogDescription ?? ""} maxLength={200} onChange={(v) => setDraft((c) => ({ ...c, seo: { ...c.seo, ogDescription: v } }))} />
           <TextField label="Open Graph image URL" value={draft.seo.ogImageUrl ?? ""} placeholder="https://…" onChange={(v) => setDraft((c) => ({ ...c, seo: { ...c.seo, ogImageUrl: v } }))} />
         </div>
-        <p className="mt-3 font-mono text-[10px] leading-4 text-dim">
+        <p className="mt-3 text-[12px] leading-5 text-muted">
           Text fields stay text — markup is rejected server-side. Tracking
           pages remain noindex. No sitemap.xml / robots.txt by design.
         </p>

@@ -1,17 +1,17 @@
 "use client";
 
 /**
- * ShareActions — the ONE canonical share control set:
+ * ShareActions — the canonical customer-sharing controls:
  *   Copy Tracking ID · Copy Tracking Link · Share on WhatsApp
  *
- * The URL comes from src/lib/tracking-link (window-aware local-dev
- * mapping). Clipboard is resilient (fallback → manual-copy hint). The
- * WhatsApp path is a plain wa.me share link — never the WhatsApp API.
- * Wraps/stacks responsively; every control is a real button/anchor.
+ * URLs come from src/lib/tracking-link (window-aware for local dev).
+ * Clipboard is resilient: native API → execCommand → visible manual copy.
+ * WhatsApp is a plain wa.me share link, never the WhatsApp API.
  */
 
 import { useState } from "react";
 import { Check, Copy, ExternalLink, MessageCircle } from "lucide-react";
+import { buttonClasses } from "@/components/ui";
 import { buildTrackingUrlFromWindow, buildWhatsAppShareUrl } from "@/lib/tracking-link";
 import { useCopyToClipboard } from "@/lib/use-copy";
 import { cn } from "@/lib/utils";
@@ -20,13 +20,11 @@ export function ShareActions({
   trackingId,
   companyName,
   slug,
-  layout = "row",
   className,
 }: {
   trackingId: string;
   companyName: string;
   slug: string;
-  layout?: "row" | "card";
   className?: string;
 }) {
   const idCopy = useCopyToClipboard();
@@ -34,19 +32,10 @@ export function ShareActions({
   const [waNote, setWaNote] = useState(false);
 
   const trackingUrl =
-    typeof window !== "undefined"
-      ? buildTrackingUrlFromWindow({ slug, trackingId })
-      : null;
+    typeof window !== "undefined" ? buildTrackingUrlFromWindow({ slug, trackingId }) : null;
   const whatsappUrl = trackingUrl
     ? buildWhatsAppShareUrl({ companyName, trackingId, trackingUrl })
     : null;
-
-  const buttonClass = cn(
-    "inline-flex items-center gap-2 border px-3.5 py-2.5 font-mono text-[10px] tracking-[0.18em] uppercase transition-colors",
-    layout === "card"
-      ? "border-line text-fog hover:border-paper/40 hover:text-paper"
-      : "border-line text-fog hover:border-paper/40 hover:text-paper",
-  );
 
   return (
     <div className={className}>
@@ -54,30 +43,30 @@ export function ShareActions({
         <button
           type="button"
           onClick={() => void idCopy.copy(trackingId)}
-          className={buttonClass}
+          className={buttonClasses("secondary", "sm")}
           aria-live="polite"
         >
           {idCopy.state === "copied" ? (
-            <Check className="h-3.5 w-3.5 text-mint" />
+            <Check className="h-3.5 w-3.5 text-ok" aria-hidden="true" />
           ) : (
-            <Copy className="h-3.5 w-3.5" />
+            <Copy className="h-3.5 w-3.5" aria-hidden="true" />
           )}
-          {idCopy.state === "copied" ? "Copied!" : "Copy Tracking ID"}
+          {idCopy.state === "copied" ? "Copied!" : "Copy tracking ID"}
         </button>
 
         <button
           type="button"
           onClick={() => trackingUrl && void linkCopy.copy(trackingUrl)}
           disabled={!trackingUrl}
-          className={buttonClass}
+          className={buttonClasses("secondary", "sm")}
           aria-live="polite"
         >
           {linkCopy.state === "copied" ? (
-            <Check className="h-3.5 w-3.5 text-mint" />
+            <Check className="h-3.5 w-3.5 text-ok" aria-hidden="true" />
           ) : (
-            <Copy className="h-3.5 w-3.5" />
+            <Copy className="h-3.5 w-3.5" aria-hidden="true" />
           )}
-          {linkCopy.state === "copied" ? "Copied!" : "Copy Tracking Link"}
+          {linkCopy.state === "copied" ? "Copied!" : "Copy tracking link"}
         </button>
 
         {whatsappUrl ? (
@@ -90,11 +79,11 @@ export function ShareActions({
               window.setTimeout(() => setWaNote(false), 1800);
             }}
             className={cn(
-              buttonClass,
-              "border-emerald-500/40 text-emerald-500 hover:border-emerald-500/70 hover:text-emerald-400",
+              buttonClasses("secondary", "sm"),
+              "border-ok/30 text-ok hover:border-ok/60 hover:bg-ok-soft",
             )}
           >
-            <MessageCircle className="h-3.5 w-3.5" />
+            <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />
             {waNote ? "Opening WhatsApp…" : "Share on WhatsApp"}
           </a>
         ) : null}
@@ -104,26 +93,28 @@ export function ShareActions({
             href={trackingUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className={buttonClass}
+            className={buttonClasses("ghost", "sm")}
           >
-            <ExternalLink className="h-3.5 w-3.5" />
+            <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
             Open tracking page
           </a>
         ) : null}
       </div>
 
       {(idCopy.state === "failed" || linkCopy.state === "failed") && trackingUrl ? (
-        <p role="status" className="mt-2 border border-line bg-panel px-3 py-2 font-mono text-[10.5px] leading-4 break-all text-fog">
-          Clipboard is unavailable in this browser — copy manually:
-          <br />
-          <span className="text-paper select-all">{trackingUrl}</span>
+        <p
+          role="status"
+          className="mt-3 rounded-lg border border-hair bg-surface-2 px-3.5 py-2.5 text-[12.5px] leading-5 break-all text-body"
+        >
+          Clipboard unavailable in this browser — copy manually:{" "}
+          <span className="font-mono text-slate select-all">{trackingUrl}</span>
         </p>
       ) : null}
     </div>
   );
 }
 
-/** Compact icon-button copy-link for package list rows. */
+/** Compact copy-link control for table rows. */
 export function CopyLinkIconButton({
   trackingId,
   slug,
@@ -135,21 +126,20 @@ export function CopyLinkIconButton({
   return (
     <button
       type="button"
-      title={state === "copied" ? "Tracking link copied!" : "Copy tracking link"}
+      title={state === "copied" ? "Tracking link copied" : "Copy tracking link"}
       aria-label={`Copy tracking link for ${trackingId}`}
       onClick={(event) => {
         event.preventDefault();
         event.stopPropagation();
         void copy(buildTrackingUrlFromWindow({ slug, trackingId }));
       }}
-      className="inline-flex items-center gap-1.5 border border-line px-2 py-1 font-mono text-[9px] tracking-[0.12em] text-fog uppercase transition-colors hover:border-paper/40 hover:text-paper"
+      className="rounded-md p-1 text-muted transition-colors hover:bg-surface-2 hover:text-slate"
     >
       {state === "copied" ? (
-        <Check className="h-3 w-3 text-mint" />
+        <Check className="h-3.5 w-3.5 text-ok" aria-hidden="true" />
       ) : (
-        <Copy className="h-3 w-3" />
+        <Copy className="h-3.5 w-3.5" aria-hidden="true" />
       )}
-      {state === "copied" ? "Copied" : "Link"}
     </button>
   );
 }

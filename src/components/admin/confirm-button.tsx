@@ -2,12 +2,13 @@
 
 /**
  * Two-step confirm button — dangerous actions (suspend, archive, reset)
- * require an explicit confirmation click before executing. Reverts to
- * idle after 4 seconds or when the pointer leaves.
+ * require an explicit second click that states the consequence. Reverts
+ * to idle after a few seconds or when the pointer leaves.
  */
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Loader2 } from "lucide-react";
+import { buttonClasses } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
 export function ConfirmButton({
@@ -16,19 +17,24 @@ export function ConfirmButton({
   onConfirm,
   tone = "neutral",
   disabled,
+  size = "sm",
 }: {
   children: ReactNode;
   confirmLabel: string;
   onConfirm: () => Promise<void>;
   tone?: "neutral" | "danger";
   disabled?: boolean;
+  size?: "sm" | "md";
 }) {
   const [state, setState] = useState<"idle" | "confirm" | "busy">("idle");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => () => {
-    if (timer.current) clearTimeout(timer.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
 
   async function onClick() {
     if (disabled) return;
@@ -50,19 +56,16 @@ export function ConfirmButton({
 
   return (
     <button
+      type="button"
       onClick={onClick}
       onMouseLeave={() => state === "confirm" && setState("idle")}
       disabled={disabled || state === "busy"}
       className={cn(
-        "inline-flex items-center gap-1.5 border px-2.5 py-1.5 font-mono text-[9.5px] tracking-[0.15em] uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-40",
-        state === "confirm"
-          ? "border-crimson/70 text-crimson"
-          : tone === "danger"
-            ? "border-line text-fog hover:border-crimson/60 hover:text-crimson"
-            : "border-line text-fog hover:border-paper/40 hover:text-paper",
+        buttonClasses(state === "confirm" || tone === "danger" ? "danger" : "secondary", size),
+        state === "confirm" && "ring-2 ring-danger/20",
       )}
     >
-      {state === "busy" ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+      {state === "busy" ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" /> : null}
       {state === "confirm" ? confirmLabel : children}
     </button>
   );

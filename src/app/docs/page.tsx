@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function DocsIndexPage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-ink text-paper">
       <header className="border-b border-line">
         <div className="mx-auto max-w-4xl px-5 pt-28 pb-12 sm:px-8">
           <Link

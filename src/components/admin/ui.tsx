@@ -1,32 +1,32 @@
 "use client";
 
 /**
- * Shared Platform-Admin form primitives — one implementation reused by
- * every tab (labels bound to controls, visible focus, accessible errors).
+ * Platform-admin form primitives — thin wrappers over the shared UI kit so
+ * the website/branding editors stay consistent with the rest of the
+ * product (labels bound to controls, visible focus, accessible errors).
  */
 
 import type { ReactNode } from "react";
-import { Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  ErrorNote,
+  Field,
+  Input,
+  Select,
+  SuccessNote,
+  TenantStatusBadge,
+  Textarea,
+  inputClasses,
+} from "@/components/ui";
 
-export const fieldClass =
-  "w-full border border-line bg-ink px-3.5 py-2.5 text-sm text-paper outline-none transition-colors placeholder:text-dim/60 focus:border-signal";
+export { inputClasses as fieldClass, Field, Input, Select, Textarea };
+export const StatusPill = TenantStatusBadge;
 
 export function Label({ children }: { children: ReactNode }) {
-  return (
-    <span className="mb-1.5 block font-mono text-[10px] tracking-[0.2em] text-dim uppercase">
-      {children}
-    </span>
-  );
-}
-
-export function Field({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <label className="block">
-      <Label>{label}</Label>
-      {children}
-    </label>
-  );
+  return <span className="mb-1.5 block text-[12.5px] font-medium text-slate">{children}</span>;
 }
 
 export function TextField({
@@ -36,6 +36,7 @@ export function TextField({
   placeholder,
   type = "text",
   maxLength,
+  hint,
 }: {
   label: string;
   value: string;
@@ -43,16 +44,16 @@ export function TextField({
   placeholder?: string;
   type?: string;
   maxLength?: number;
+  hint?: string;
 }) {
   return (
-    <Field label={label}>
-      <input
+    <Field label={label} hint={hint}>
+      <Input
         type={type}
         value={value}
         maxLength={maxLength}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
-        className={fieldClass}
       />
     </Field>
   );
@@ -75,13 +76,12 @@ export function TextArea({
 }) {
   return (
     <Field label={label}>
-      <textarea
-        value={value}
+      <Textarea
         rows={rows}
+        value={value}
         maxLength={maxLength}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
-        className={fieldClass}
       />
     </Field>
   );
@@ -104,13 +104,13 @@ export function ColorField({
           value={value}
           onChange={(event) => onChange(event.target.value)}
           aria-label={`${label} color picker`}
-          className="h-9 w-10 shrink-0 cursor-pointer border border-line bg-ink"
+          className="h-10 w-11 shrink-0 cursor-pointer rounded-lg border border-hair-strong bg-surface p-1"
         />
-        <input
+        <Input
           value={value}
           onChange={(event) => onChange(event.target.value)}
           aria-label={`${label} hex value`}
-          className={`${fieldClass} font-mono text-[12px]`}
+          className="font-mono text-[13px]"
         />
       </span>
     </Field>
@@ -129,16 +129,16 @@ export function Toggle({
   hint?: string;
 }) {
   return (
-    <label className="flex cursor-pointer items-start gap-3 border border-line bg-ink px-3.5 py-3">
+    <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-hair bg-surface px-3.5 py-3 transition-colors hover:border-hair-strong">
       <input
         type="checkbox"
         checked={checked}
         onChange={(event) => onChange(event.target.checked)}
-        className="mt-0.5 h-4 w-4 accent-[color:var(--color-signal)]"
+        className="mt-0.5 h-4 w-4 accent-[color:var(--color-accent)]"
       />
       <span>
-        <span className="block text-[13px] font-medium text-paper">{label}</span>
-        {hint ? <span className="mt-0.5 block font-mono text-[10px] text-dim">{hint}</span> : null}
+        <span className="block text-[13.5px] font-medium text-slate">{label}</span>
+        {hint ? <span className="mt-0.5 block text-[12px] text-muted">{hint}</span> : null}
       </span>
     </label>
   );
@@ -158,49 +158,21 @@ export function SaveBar({
   label?: string;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-4 border-t border-line pt-4">
-      <button
-        onClick={onSave}
-        disabled={busy}
-        className="inline-flex items-center gap-2 border border-paper/25 bg-paper px-4 py-2.5 font-mono text-[10px] font-medium tracking-[0.2em] text-ink uppercase transition-colors hover:border-signal hover:bg-signal disabled:opacity-50"
-      >
-        {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+    <div className="sticky bottom-4 z-10 flex flex-wrap items-center gap-4 rounded-xl border border-hair bg-surface/95 px-4 py-3 shadow-[var(--shadow-raised)] backdrop-blur">
+      <Button variant="primary" onClick={onSave} loading={busy}>
         {label}
-      </button>
-      {message ? (
-        <p role="status" className="font-mono text-[11px] text-mint">{message}</p>
-      ) : null}
-      {error ? (
-        <p role="alert" className="font-mono text-[11px] text-crimson">{error}</p>
-      ) : null}
+      </Button>
+      {message ? <SuccessNote>{message}</SuccessNote> : null}
+      {error ? <ErrorNote>{error}</ErrorNote> : null}
     </div>
   );
 }
 
 export function Panel({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="border border-line bg-panel p-5 sm:p-6">
-      <p className="mb-4 font-mono text-[10px] tracking-[0.25em] text-signal uppercase">{title}</p>
-      {children}
-    </section>
-  );
-}
-
-export function StatusPill({ status }: { status: "ACTIVE" | "SUSPENDED" | "ARCHIVED" }) {
-  const tone: Record<typeof status, string> = {
-    ACTIVE: "border-mint/40 text-mint",
-    SUSPENDED: "border-amber/40 text-amber",
-    ARCHIVED: "border-line text-dim",
-  };
-  const glyph: Record<typeof status, string> = {
-    ACTIVE: "●",
-    SUSPENDED: "❚❚",
-    ARCHIVED: "▣",
-  };
-  return (
-    <span className={cn("inline-flex items-center gap-1.5 border px-2 py-0.5 font-mono text-[9.5px] tracking-[0.18em]", tone[status])}>
-      <span aria-hidden="true">{glyph[status]}</span>
-      {status}
-    </span>
+    <Card>
+      <CardHeader title={title} />
+      <CardBody>{children}</CardBody>
+    </Card>
   );
 }

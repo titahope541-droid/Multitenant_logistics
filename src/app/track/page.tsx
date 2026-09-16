@@ -35,7 +35,7 @@ export default async function TrackPageRoute({
   if (resolution.kind !== "tenant") {
     // Platform host: point developers at the local-subdomain pattern.
     return (
-      <div className="relative min-h-screen">
+      <div className="relative min-h-screen bg-ink text-paper">
         <Nav />
         <main className="mx-auto max-w-xl px-5 pt-32 pb-20 text-center">
           <p className="font-mono text-[10px] tracking-[0.25em] text-signal uppercase">Public tracking</p>

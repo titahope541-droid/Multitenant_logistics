@@ -41,6 +41,7 @@ describe("isOriginAllowed (developer/lab domain: yourplatform.com)", () => {
     expect(isOriginAllowed("https://swift.yourplatform.com")).toBe(true);
     expect(isOriginAllowed("https://admin.yourplatform.com")).toBe(true);
     expect(isOriginAllowed("http://localhost:3000")).toBe(true);
+    expect(isOriginAllowed("http://swift.localhost:3000")).toBe(true);
   });
 
   it("rejects foreign origins and malformed values", () => {

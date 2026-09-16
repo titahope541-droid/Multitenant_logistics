@@ -12,11 +12,14 @@ export const metadata: Metadata = { title: "Tenant" };
 
 export default async function TenantDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ tenantId: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }) {
   await requirePageRole("PLATFORM_ADMIN");
   const { tenantId } = await params;
+  const { tab } = await searchParams;
   if (!OBJECT_ID_PATTERN.test(tenantId)) notFound();
 
   const [details, website] = await Promise.all([
@@ -30,6 +33,7 @@ export default async function TenantDetailPage({
       initialDetails={details}
       initialWebsite={website}
       platformDomain={getServerConfig().platformDomain}
+      initialTab={tab}
     />
   );
 }

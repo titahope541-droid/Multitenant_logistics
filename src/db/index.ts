@@ -34,6 +34,14 @@ import { getLogger } from "@/server/utils/logger";
 
 const log = getLogger("db");
 
+/**
+ * Fail fast instead of queueing: without this, a model call made before
+ * the pool is up waits on Mongoose's 10s command buffer and surfaces as a
+ * confusing timeout. With buffering off, the call errors immediately and
+ * the caller's error boundary reports it truthfully.
+ */
+mongoose.set("bufferCommands", false);
+
 interface MongooseCache {
   connection: typeof mongoose | null;
   pending: Promise<typeof mongoose> | null;
@@ -108,7 +116,9 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
   cache.pending ??= mongoose
     .connect(uri, {
       bufferCommands: false,
-      serverSelectionTimeoutMS: 2500,
+      // Enough headroom for real deployments (Atlas TLS handshake, replica
+      // set discovery) while still failing fast for health reporting.
+      serverSelectionTimeoutMS: 8000,
       maxPoolSize: 10,
       // Index builds are explicit (src/db/ensure-indexes.ts), never implicit
       // at boot — per-connection autoIndex is a production anti-pattern.

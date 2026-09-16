@@ -1,35 +1,75 @@
 @import "tailwindcss";
 
 /* ──────────────────────────────────────────────────────────────────────────
-   MERIDIAN — Design tokens (Phase 1)
-   Logistics-grade dark system: ink surfaces, hairline structure, one signal
-   accent used sparingly, semantic tones reserved for operational status.
+   MERIDIAN — design tokens
+
+   TWO coherent palettes, one product:
+
+   1. PRODUCT (light)  — tenant admin, platform admin, customer websites,
+      tracking, login. Soft neutral canvas, white cards, slate type, a single
+      warm accent. Professional logistics software, not a developer console.
+
+   2. PORTAL (dark)    — the internal developer portal + /docs reader only.
+      Kept intentionally so engineering surfaces stay visually separate.
    ────────────────────────────────────────────────────────────────────────── */
 
 @theme {
   --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-ibm-plex-mono), ui-monospace, "SF Mono", monospace;
 
-  --color-ink: #05080d; /* page background */
-  --color-panel: #090e15; /* raised surface */
-  --color-panel-2: #0d141d; /* hover / deep panel */
-  --color-line: #1a2431; /* hairlines */
+  /* ── PRODUCT palette (light) ── */
+  --color-canvas: #f4f6f8; /* app background */
+  --color-surface: #ffffff; /* cards, sidebar, header */
+  --color-surface-2: #fafbfc; /* table headers, subtle fills */
+  --color-hair: #e8eaef; /* borders */
+  --color-hair-strong: #d3d8e0;
+  --color-slate: #0f172a; /* headings */
+  --color-body: #475569; /* body copy */
+  --color-muted: #8b96a8; /* secondary/labels */
+
+  --color-accent: #2563eb; /* primary action — clean blue */
+  --color-accent-hover: #1d4ed8;
+  --color-accent-soft: #eff6ff;
+
+  --color-info: #2563eb; /* in transit */
+  --color-info-soft: #eef4ff;
+  --color-ok: #047857; /* success */
+  --color-ok-soft: #ecfdf5;
+  --color-warn: #b45309; /* pending/attention */
+  --color-warn-soft: #fffaeb;
+  --color-danger: #b91c1c; /* destructive/errors */
+  --color-danger-soft: #fef2f2;
+  --color-violet: #6d28d9; /* facility */
+  --color-violet-soft: #f5f3ff;
+
+  /* ── Sidebar (dark navy, shared by both consoles) ── */
+  --color-sidebar: #0e1726;
+  --color-sidebar-raised: #182742;
+  --color-sidebar-border: #24334f;
+  --color-sidebar-text: #93a3c0;
+  --color-sidebar-accent: #6ba3f8;
+
+  --shadow-card: 0 1px 2px rgb(16 24 40 / 0.04), 0 1px 3px rgb(16 24 40 / 0.06);
+  --shadow-raised: 0 8px 24px rgb(16 24 40 / 0.12);
+
+  /* ── PORTAL palette (dark) — developer portal + docs only ── */
+  --color-ink: #05080d;
+  --color-panel: #090e15;
+  --color-panel-2: #0d141d;
+  --color-line: #1a2431;
   --color-line-strong: #2b3949;
-
-  --color-paper: #edf2f7; /* primary text */
-  --color-fog: #8e9aac; /* secondary text */
-  --color-dim: #55647a; /* tertiary text / labels */
-
-  --color-signal: #ff5c1a; /* the single accent */
+  --color-paper: #edf2f7;
+  --color-fog: #8e9aac;
+  --color-dim: #55647a;
+  --color-signal: #ff5c1a;
   --color-signal-hot: #ff7438;
-
-  --color-mint: #3ddc97; /* healthy */
-  --color-amber: #ffb224; /* degraded / planned */
-  --color-crimson: #ff4d5e; /* down / danger */
+  --color-mint: #3ddc97;
+  --color-amber: #ffb224;
+  --color-crimson: #ff4d5e;
 
   --animate-marquee: marquee 46s linear infinite;
   --animate-pulse-soft: pulse-soft 2.4s ease-in-out infinite;
-  --animate-rise: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-rise: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @keyframes marquee {
     from {
@@ -51,7 +91,7 @@
   @keyframes rise {
     from {
       opacity: 0;
-      transform: translateY(18px);
+      transform: translateY(12px);
     }
     to {
       opacity: 1;
@@ -60,13 +100,12 @@
   }
 }
 
-/* Subtle dotted survey-grid backdrop. */
+/* Dotted survey grid — portal backdrop only. */
 @utility dotgrid {
   background-image: radial-gradient(var(--color-line-strong) 1px, transparent 1px);
   background-size: 28px 28px;
 }
 
-/* Fade edges for marquees and tickers. */
 @utility edge-fade {
   mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
 }
@@ -74,51 +113,62 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
-    @apply bg-ink font-sans text-paper antialiased;
+    @apply bg-canvas font-sans text-body antialiased;
     text-rendering: optimizeLegibility;
   }
 
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-slate;
+    text-wrap: balance;
+  }
+
   ::selection {
-    background: var(--color-signal);
-    color: var(--color-ink);
+    background: var(--color-accent);
+    color: #ffffff;
   }
 
+  /* Visible, consistent keyboard focus everywhere. */
   :focus-visible {
-    outline: 2px solid var(--color-signal);
-    outline-offset: 3px;
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
   }
 
-  ::-webkit-scrollbar {
-    width: 10px;
-  }
-  ::-webkit-scrollbar-track {
-    background: var(--color-ink);
-  }
-  ::-webkit-scrollbar-thumb {
-    background: var(--color-line-strong);
-    border: 3px solid var(--color-ink);
-    border-radius: 8px;
+  /* Respect reduced-motion: no decorative movement. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-/* Leaflet marker pin — brand-driven, asset-free (no icon images needed). */
+/* Leaflet marker pin — brand-driven, asset-free (no icon image requests). */
 .meridian-map-pin {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: var(--brand, #0b5fff);
+  background: var(--brand, var(--color-accent));
   border: 3px solid #ffffff;
   box-shadow:
-    0 0 0 3px color-mix(in srgb, var(--brand, #0b5fff) 35%, transparent),
-    0 2px 6px rgb(0 0 0 / 0.35);
+    0 0 0 3px color-mix(in srgb, var(--brand, var(--color-accent)) 30%, transparent),
+    0 2px 6px rgb(15 23 42 / 0.25);
 }
 
 .leaflet-container {
   font: inherit;
-  background: #e8edf2;
+  background: #eef1f5;
 }
 
 .leaflet-control-attribution {

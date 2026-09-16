@@ -89,4 +89,7 @@ async function main(): Promise<void> {
   }
 }
 
-await main();
+void main().catch((error) => {
+  console.error(`seed-demo-tenant: ${error instanceof Error ? error.message : error}`);
+  process.exit(1);
+});

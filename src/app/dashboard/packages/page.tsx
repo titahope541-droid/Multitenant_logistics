@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { PlusCircle } from "lucide-react";
 import { PackagesManager } from "@/components/tenant/packages-manager";
+import { PageHeader, buttonClasses } from "@/components/ui";
 import { TenantModel } from "@/db/models/tenant.model";
 import { requirePageRole } from "@/server/middleware/page-auth";
 
@@ -11,22 +14,20 @@ export default async function TenantPackagesPage() {
   const tenant = auth.user.tenantId
     ? await TenantModel.findById(auth.user.tenantId).lean()
     : null;
+
   return (
-    <div>
-      <div className="mb-8">
-        <p className="mb-2 font-mono text-[10px] tracking-[0.3em] text-signal uppercase">
-          Operations — packages
-        </p>
-        <h1 className="text-3xl font-bold tracking-[-0.02em] text-paper">
-          Your tenant&apos;s shipments.
-        </h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-fog">
-          Scoped to your tenant only — the server makes every other tenant
-          invisible. Archived packages live in the archive drawer until
-          restored.
-        </p>
-      </div>
+    <>
+      <PageHeader
+        title="Packages"
+        description="Every shipment belonging to your company. Archived packages stay hidden until you open the archive."
+        actions={
+          <Link href="/dashboard/packages/new" className={buttonClasses("primary")}>
+            <PlusCircle className="h-4 w-4" aria-hidden="true" />
+            Create package
+          </Link>
+        }
+      />
       <PackagesManager slug={tenant?.slug ?? ""} />
-    </div>
+    </>
   );
 }

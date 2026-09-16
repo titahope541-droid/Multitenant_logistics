@@ -21,8 +21,10 @@ import { apiErrors } from "@/server/http/errors";
 import { getLogger } from "@/server/utils/logger";
 import {
   DEFAULT_BRANDING,
+  DEFAULT_FAQ,
   DEFAULT_HERO_CTA_HREF,
   DEFAULT_HERO_CTA_LABEL,
+  DEFAULT_HOW_IT_WORKS,
   DEFAULT_NAVIGATION,
   DEFAULT_SECTION_ORDER,
   DEFAULT_TRACKING_SECTION,
@@ -36,23 +38,55 @@ const log = getLogger("website");
 
 /* ── Projection: document (possibly absent/partial) → render model ───────── */
 
-function mapCards(items: Array<{ title: string; description?: string; icon?: string; visible?: boolean }> | undefined): WebsiteCardItem[] {
+function mapCards(
+  items:
+    | Array<{
+        title: string;
+        label?: string;
+        description?: string;
+        icon?: string;
+        imageUrl?: string;
+        visible?: boolean;
+      }>
+    | undefined,
+): WebsiteCardItem[] {
   return (items ?? []).map((item) => ({
     title: item.title,
+    ...(item.label ? { label: item.label } : {}),
     ...(item.description ? { description: item.description } : {}),
     ...(item.icon ? { icon: item.icon as WebsiteCardItem["icon"] } : {}),
+    ...(item.imageUrl ? { imageUrl: item.imageUrl } : {}),
     visible: item.visible !== false,
   }));
 }
 
+/**
+ * Normalize a stored section order:
+ *   · unknown keys dropped, duplicates collapsed
+ *   · sections missing from an older configuration (e.g. FAQ, added later)
+ *     are inserted at their DEFAULT position rather than dumped at the end,
+ *     so a legacy tenant upgrades to a coherent layout automatically.
+ */
 function normalizeOrder(order: string[] | undefined): WebsiteSectionKey[] {
   const known = (order ?? []).filter((key): key is WebsiteSectionKey =>
     (WEBSITE_SECTION_KEYS as readonly string[]).includes(key),
   );
-  const deduped = [...new Set(known)];
-  // Any section missing from a stored order still renders, at the end.
-  const missing = DEFAULT_SECTION_ORDER.filter((key) => !deduped.includes(key));
-  return deduped.length > 0 ? [...deduped, ...missing] : [...DEFAULT_SECTION_ORDER];
+  const result: WebsiteSectionKey[] = [...new Set(known)];
+
+  for (const key of DEFAULT_SECTION_ORDER) {
+    if (result.includes(key)) continue;
+    let insertAt = result.length;
+    for (let index = DEFAULT_SECTION_ORDER.indexOf(key) - 1; index >= 0; index -= 1) {
+      const previous = DEFAULT_SECTION_ORDER[index]!;
+      const foundAt = result.indexOf(previous);
+      if (foundAt !== -1) {
+        insertAt = foundAt + 1;
+        break;
+      }
+    }
+    result.splice(insertAt, 0, key);
+  }
+  return result;
 }
 
 export function buildPublicWebsiteData(
@@ -122,6 +156,28 @@ export function buildPublicWebsiteData(
         heading: sections?.tracking?.heading?.trim() || DEFAULT_TRACKING_SECTION.heading,
         subtext: sections?.tracking?.subtext?.trim() || DEFAULT_TRACKING_SECTION.subtext,
         ctaLabel: sections?.tracking?.ctaLabel?.trim() || DEFAULT_TRACKING_SECTION.ctaLabel,
+      },
+      howItWorks: {
+        enabled: sections?.howItWorks?.enabled ?? true,
+        title: sections?.howItWorks?.title?.trim() || DEFAULT_HOW_IT_WORKS.title,
+        steps: (sections?.howItWorks?.steps?.length
+          ? sections.howItWorks.steps
+          : DEFAULT_HOW_IT_WORKS.steps
+        ).map((step) => ({
+          title: step.title,
+          ...(step.description ? { description: step.description } : {}),
+        })),
+      },
+      faq: {
+        enabled: sections?.faq?.enabled ?? true,
+        title: sections?.faq?.title?.trim() || DEFAULT_FAQ.title,
+        items: (sections?.faq?.items?.length ? sections.faq.items : DEFAULT_FAQ.items).map(
+          (item) => ({
+            question: item.question,
+            answer: item.answer,
+            visible: item.visible !== false,
+          }),
+        ),
       },
       contact: {
         enabled: sections?.contact?.enabled ?? true,
@@ -233,7 +289,17 @@ export async function updateWebsiteConfig(
 
   if (draft.sections) {
     const next = { ...(doc.sections ?? {}) } as WebsiteConfigDocument["sections"];
-    for (const key of ["hero", "services", "about", "features", "tracking", "contact", "footer"] as const) {
+    for (const key of [
+      "hero",
+      "services",
+      "about",
+      "features",
+      "howItWorks",
+      "tracking",
+      "faq",
+      "contact",
+      "footer",
+    ] as const) {
       const patch = draft.sections[key];
       if (!patch) continue;
       next[key] = { ...(next[key] ?? {}), ...patch } as never;

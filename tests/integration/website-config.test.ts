@@ -216,6 +216,52 @@ describe("configuration validation (content stays content)", () => {
   });
 });
 
+
+describe("landing redesign: FAQ + how it works configuration", () => {
+  it("provides accurate platform defaults and exposes the new sections", async () => {
+    const tenant = await seedTenant({ slug: "swift" });
+    const config = await websiteService.getWebsiteConfig(String(tenant._id));
+
+    expect(config.sections.howItWorks.enabled).toBe(true);
+    expect(config.sections.howItWorks.steps).toHaveLength(3);
+    expect(config.sections.howItWorks.steps[0]!.title).toBe("Receive your tracking ID");
+    expect(config.sections.faq.items.length).toBeGreaterThan(0);
+    expect(config.sectionOrder).toContain("howItWorks");
+    expect(config.sectionOrder).toContain("faq");
+  });
+
+  it("saves FAQ entries and how-it-works steps", async () => {
+    const tenant = await seedTenant({ slug: "swift" });
+    const saved = await websiteService.updateWebsiteConfig(String(tenant._id), {
+      sections: {
+        faq: { items: [{ question: "How do I track?", answer: "Use the tracking page.", visible: true }] },
+        howItWorks: { steps: [{ title: "Get your ID", description: "From the sender." }] },
+      },
+    });
+    expect(saved.sections.faq.items[0]?.question).toBe("How do I track?");
+    expect(saved.sections.howItWorks.steps).toHaveLength(1);
+    expect(saved.sections.howItWorks.steps[0]?.description).toBe("From the sender.");
+  });
+
+  it("rejects markup in FAQ answers and oversized step lists", () => {
+    expectValidationRejection({
+      sections: { faq: { items: [{ question: "q", answer: "<script>alert(1)</script>", visible: true }] } },
+    });
+    expectValidationRejection({
+      sections: { howItWorks: { steps: Array.from({ length: 6 }, () => ({ title: "Step" })) } },
+    });
+  });
+
+  it("upgrades a legacy section order to include the new sections in place", async () => {
+    const tenant = await seedTenant({ slug: "swift" });
+    const saved = await websiteService.updateWebsiteConfig(String(tenant._id), {
+      // the pre-FAQ order stored by earlier phases
+      sectionOrder: ["hero", "services", "about", "features", "tracking", "contact"],
+    });
+    expect(saved.sectionOrder).toEqual(DEFAULT_SECTION_ORDER);
+  });
+});
+
 describe("tenant isolation of configuration", () => {
   it("editing tenant A never touches tenant B", async () => {
     const a = await seedTenant({ slug: "alpha", companyName: "Alpha" });

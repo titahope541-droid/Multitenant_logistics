@@ -9,6 +9,7 @@ import type {
   AdminPackageDetails,
   AdminPackageListItem,
   CreatePackagePayload,
+  CreatedPackageResult,
   ListPackagesQuery,
 } from "@/types/package";
 import type { Paginated } from "@/types/tenant";
@@ -24,8 +25,8 @@ export function listPackages(query: ListPackagesQuery = {}): Promise<Paginated<A
   return apiClient.get<Paginated<AdminPackageListItem>>(`/admin/packages${suffix}`);
 }
 
-export function createPackage(payload: CreatePackagePayload): Promise<AdminPackageDetails> {
-  return apiClient.post<AdminPackageDetails>("/admin/packages", payload);
+export function createPackage(payload: CreatePackagePayload): Promise<CreatedPackageResult> {
+  return apiClient.post<CreatedPackageResult>("/admin/packages", payload);
 }
 
 export function getPackageDetails(packageId: string): Promise<AdminPackageDetails> {

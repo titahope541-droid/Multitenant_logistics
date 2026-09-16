@@ -1,10 +1,10 @@
 "use client";
 
 /**
- * Customer TrackingMap — ONE marker, no controls beyond zoom, no search,
- * no editing. Marker follows the currentLocation prop (initial REST
- * snapshot and every later realtime event). Falls back to a textual
- * panel when the map cannot render — tracking never depends on tiles.
+ * Customer TrackingMap — one navigable marker, no search or editing.
+ * Marker follows the currentLocation prop (initial REST snapshot and every
+ * later realtime event). Falls back to a textual panel when the map cannot
+ * render — tracking never depends on tiles.
  */
 
 import dynamic from "next/dynamic";
@@ -41,7 +41,7 @@ export function TrackingMap({ location }: { location: CurrentLocationDto | null 
       center={{ lat: location.latitude, lng: location.longitude }}
       zoom={12}
       marker={{ lat: location.latitude, lng: location.longitude, label: location.locationName }}
-      interactive={false}
+      interactive
       onFailure={() => setFailed(true)}
     />
   );

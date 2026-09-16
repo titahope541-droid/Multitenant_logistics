@@ -18,6 +18,7 @@
  */
 
 import { headers } from "next/headers";
+import { connectToDatabase } from "@/db";
 import { TenantModel } from "@/db/models/tenant.model";
 import { getServerConfig } from "@/server/config/env";
 import { getLogger } from "@/server/utils/logger";
@@ -102,6 +103,7 @@ export async function resolveTenantFromHostHeader(hostHeader: string | null): Pr
     return { kind: "unknown", host: hostHeader ?? "", slug: null };
   }
 
+  await connectToDatabase().catch(() => undefined);
   const tenant = await TenantModel.findOne({ slug: parsed.slug }).lean();
   if (!tenant) {
     log.info({ slug: parsed.slug }, "hostname mapped to slug but no tenant exists");

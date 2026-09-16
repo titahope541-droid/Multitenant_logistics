@@ -60,7 +60,13 @@ function toTenantDetailsTenant(doc: HydratedDocument<TenantDocument>): TenantDet
     companyName: doc.companyName,
     slug: doc.slug,
     status: doc.status,
-    contact: doc.contact ?? {},
+    contact: doc.contact
+      ? {
+          ...(doc.contact.phone !== undefined ? { phone: doc.contact.phone } : {}),
+          ...(doc.contact.email !== undefined ? { email: doc.contact.email } : {}),
+          ...(doc.contact.address !== undefined ? { address: doc.contact.address } : {}),
+        }
+      : {},
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   };

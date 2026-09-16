@@ -23,8 +23,23 @@ export interface WebsiteNavigationItem {
 
 export interface WebsiteCardItem {
   title: string;
+  /** Small category chip above the title (e.g. "Local"). */
+  label?: string;
   description?: string;
   icon?: WebsiteIcon;
+  /** URL-based imagery only — there is no upload system. */
+  imageUrl?: string;
+  visible: boolean;
+}
+
+export interface WebsiteStepItem {
+  title: string;
+  description?: string;
+}
+
+export interface WebsiteFaqItem {
+  question: string;
+  answer: string;
   visible: boolean;
 }
 
@@ -60,7 +75,9 @@ export interface WebsiteSections {
   services: { enabled: boolean; title: string; items: WebsiteCardItem[] };
   about: { enabled: boolean; title: string; text?: string; imageUrl?: string };
   features: { enabled: boolean; title: string; items: WebsiteCardItem[] };
+  howItWorks: { enabled: boolean; title: string; steps: WebsiteStepItem[] };
   tracking: { enabled: boolean; heading: string; subtext: string; ctaLabel: string };
+  faq: { enabled: boolean; title: string; items: WebsiteFaqItem[] };
   contact: { enabled: boolean; hours?: string };
   footer: { enabled: boolean; text?: string; showNavigation: boolean; showSocial: boolean };
 }
@@ -84,7 +101,7 @@ export interface PublicWebsiteData {
   contact: { phone?: string; email?: string; address?: string };
   socialLinks: WebsiteSocialLink[];
   seo: WebsiteSeo;
-  /** True when no config row existed and identity defaults carried the render. */
+  /** True when no config row existed and identity fallbacks carried the render. */
   usingDefaults: boolean;
 }
 
@@ -98,7 +115,9 @@ export interface WebsiteConfigDraft {
     services?: { enabled?: boolean; title?: string; items?: WebsiteCardItem[] };
     about?: Partial<PublicWebsiteData["sections"]["about"]>;
     features?: { enabled?: boolean; title?: string; items?: WebsiteCardItem[] };
+    howItWorks?: { enabled?: boolean; title?: string; steps?: WebsiteStepItem[] };
     tracking?: Partial<PublicWebsiteData["sections"]["tracking"]>;
+    faq?: { enabled?: boolean; title?: string; items?: WebsiteFaqItem[] };
     contact?: Partial<PublicWebsiteData["sections"]["contact"]>;
     footer?: Partial<PublicWebsiteData["sections"]["footer"]>;
   };

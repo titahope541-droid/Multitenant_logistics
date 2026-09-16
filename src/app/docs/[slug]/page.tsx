@@ -33,7 +33,7 @@ export default async function DocPage({ params }: { params: Promise<PageParams> 
   if (!doc) notFound();
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-ink text-paper">
       <header className="border-b border-line">
         <div className="mx-auto max-w-3xl px-5 pt-28 pb-10 sm:px-8">
           <Link

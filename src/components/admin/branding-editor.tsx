@@ -49,7 +49,7 @@ export function BrandingEditor({
   return (
     <div className="space-y-5">
       <Panel title="Identity">
-        <p className="mb-4 font-mono text-[10.5px] leading-4 text-dim">
+        <p className="mb-4 text-[12.5px] leading-5 text-muted">
           Company name comes from tenant identity ({companyName}) — change
           it on the Overview tab. Images are URLs; there is no upload
           system. A publicly reachable URL is not automatically licensed
@@ -106,7 +106,7 @@ export function BrandingEditor({
             </select>
           </Field>
         </div>
-        <div className="mt-5 flex flex-wrap items-center gap-4 border border-line p-4" style={{ backgroundColor: branding.backgroundColor }}>
+        <div className="mt-5 flex flex-wrap items-center gap-4 border border-hair p-4" style={{ backgroundColor: branding.backgroundColor }}>
           <span className="font-mono text-[10px] tracking-[0.2em] uppercase" style={{ color: branding.textColor, opacity: 0.6 }}>
             Live preview
           </span>

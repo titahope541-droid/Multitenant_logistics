@@ -27,14 +27,14 @@ const COPY: Record<UnavailableReason, { title: string; lead: string; foot: strin
 export function SiteUnavailable({ reason }: { reason: UnavailableReason }) {
   const copy = COPY[reason];
   return (
-    <main className="flex min-h-screen items-center justify-center bg-ink px-5">
+    <main className="flex min-h-screen items-center justify-center bg-canvas px-5">
       <div className="max-w-md text-center">
-        <CloudOff className="mx-auto h-10 w-10 text-dim" strokeWidth={1.25} />
-        <h1 className="mt-6 text-2xl font-bold tracking-[-0.01em] text-paper sm:text-3xl">
+        <CloudOff className="mx-auto h-10 w-10 text-muted" strokeWidth={1.25} />
+        <h1 className="mt-6 text-2xl font-semibold tracking-[-0.02em] text-slate sm:text-3xl">
           {copy.title}
         </h1>
-        <p className="mt-4 text-[15px] leading-7 text-fog">{copy.lead}</p>
-        <p className="mt-8 font-mono text-[10px] tracking-[0.2em] text-dim uppercase">
+        <p className="mt-4 text-[15px] leading-7 text-body">{copy.lead}</p>
+        <p className="mt-8 text-[12px] text-muted">
           {copy.foot}
         </p>
       </div>

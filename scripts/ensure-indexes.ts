@@ -33,4 +33,7 @@ async function main(): Promise<void> {
   }
 }
 
-await main();
+void main().catch((error) => {
+  console.error(`ensure-indexes: ${error instanceof Error ? error.message : error}`);
+  process.exit(1);
+});
