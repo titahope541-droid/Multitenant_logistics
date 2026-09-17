@@ -33,20 +33,20 @@ describe("checkRateLimit (sliding window)", () => {
   });
 });
 
-describe("isOriginAllowed (developer/lab domain: yourplatform.com)", () => {
+describe("isOriginAllowed (production domain: nttrack.com)", () => {
   it("accepts platform domain, subdomains, and localhost in non-production", () => {
-    process.env.NEXT_PUBLIC_PLATFORM_DOMAIN = "yourplatform.com";
+    process.env.NEXT_PUBLIC_PLATFORM_DOMAIN = "nttrack.com";
     process.env.NEXT_PUBLIC_APP_URL = "http://localhost:3000";
-    expect(isOriginAllowed("https://yourplatform.com")).toBe(true);
-    expect(isOriginAllowed("https://swift.yourplatform.com")).toBe(true);
-    expect(isOriginAllowed("https://admin.yourplatform.com")).toBe(true);
+    expect(isOriginAllowed("https://nttrack.com")).toBe(true);
+    expect(isOriginAllowed("https://swift.nttrack.com")).toBe(true);
+    expect(isOriginAllowed("https://admin.nttrack.com")).toBe(true);
     expect(isOriginAllowed("http://localhost:3000")).toBe(true);
     expect(isOriginAllowed("http://swift.localhost:3000")).toBe(true);
   });
 
   it("rejects foreign origins and malformed values", () => {
     expect(isOriginAllowed("https://evil.example.com")).toBe(false);
-    expect(isOriginAllowed("https://yourplatform.com.evil.io")).toBe(false);
+    expect(isOriginAllowed("https://nttrack.com.evil.io")).toBe(false);
     expect(isOriginAllowed("javascript:alert(1)")).toBe(false);
     expect(isOriginAllowed("")).toBe(false);
   });

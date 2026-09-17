@@ -44,6 +44,8 @@ In Vercel, use these project settings:
 
 | Setting | Value |
 | --- | --- |
+   ├── nttrack.com and *.nttrack.com → Vercel
+   └── realtime.nttrack.com → separate Node host (optional, Socket.IO)
 | Framework Preset | Next.js |
 | Build Command | `npm run build` |
 | Install Command | `npm ci` |
@@ -51,9 +53,9 @@ In Vercel, use these project settings:
 | Node.js Version | 22.x, if available |
 
 The Vercel deployment must use the Next.js runtime, not `npm start`. Vercel
-will discover the `app/` routes and API route handlers automatically.
+ NEXT_PUBLIC_APP_URL=https://nttrack.com
 
-## 2. Create the Vercel project
+ NEXT_PUBLIC_PLATFORM_DOMAIN=nttrack.com
 
 1. Push the repository to GitHub, GitLab, or Bitbucket.
 2. In Vercel, select **Add New Project** and import the repository.
@@ -61,8 +63,8 @@ will discover the `app/` routes and API route handlers automatically.
 4. Do not add the custom `server.ts` as a Vercel entrypoint.
 5. Add the environment variables in the next section before the first
    production deployment.
-
-## 3. Add Vercel environment variables
+ GEOCODING_USER_AGENT=meridian-logistics/1.0 (contact: ops@nttrack.com)
+ GEOCODING_CONTACT=ops@nttrack.com
 
 Add these variables under **Project → Settings → Environment Variables**.
 Apply the production values to **Production**. Add Preview values separately
@@ -70,10 +72,10 @@ if preview deployments need database access.
 
 ### Required production variables
 
-```text
-NODE_ENV=production
-MONGODB_URI=mongodb+srv://USER:PASSWORD@CLUSTER.mongodb.net/meridian
-SESSION_SECRET=<long-random-secret>
+ nttrack.com
+ www.nttrack.com
+ admin.nttrack.com
+ *.nttrack.com
 LOG_LEVEL=warn
 NEXT_PUBLIC_APP_URL=https://yourdomain.com
 NEXT_PUBLIC_API_BASE_URL=/api/v1
@@ -81,19 +83,19 @@ NEXT_PUBLIC_PLATFORM_DOMAIN=yourdomain.com
 PLATFORM_HOST_SUFFIXES=
 ```
 
-### Recommended production variables
-
-```text
-GEOCODING_BASE_URL=https://nominatim.openstreetmap.org
+ nslookup nttrack.com
+ nslookup www.nttrack.com
+ nslookup admin.nttrack.com
+ nslookup swift.nttrack.com
 GEOCODING_USER_AGENT=meridian-logistics/1.0 (contact: ops@yourdomain.com)
 GEOCODING_CONTACT=ops@yourdomain.com
 NEXT_PUBLIC_OSM_TILE_URL=https://tile.openstreetmap.org/{z}/{x}/{y}.png
 ```
 
-Use a new production MongoDB Atlas database user. Never put MongoDB or session
-secrets in a `NEXT_PUBLIC_*` variable.
-
-## 4. Configure MongoDB Atlas
+ https://nttrack.com
+ https://www.nttrack.com
+ https://admin.nttrack.com/login
+ https://swift.nttrack.com/track
 
 1. Create or select the production Atlas cluster.
 2. Create a database user with read/write access to the `meridian` database.
@@ -101,21 +103,21 @@ secrets in a `NEXT_PUBLIC_*` variable.
    policy. Vercel serverless functions do not have one permanent outbound IP
    on standard plans, so do not assume the local development allow-list is
    sufficient. Use Vercel's documented static-egress option if strict IP
-   allow-listing is required, or use another approved network control.
-4. Copy the Atlas connection string into `MONGODB_URI`.
+ NEXT_PUBLIC_PLATFORM_DOMAIN=nttrack.com
+ NEXT_PUBLIC_APP_URL=https://nttrack.com
 5. Deploy, then run the index setup against the production database from a
    trusted environment:
 
 ```bash
 MONGODB_URI="mongodb+srv://..." npx tsx scripts/ensure-indexes.ts
 ```
-
+ https://swift.nttrack.com
 Never run that command against a production database from an untrusted local
 machine with credentials embedded in shell history.
 
 ## 5. Add the domain to Vercel
 
-In **Vercel → Project → Settings → Domains**, add:
+ https://swift.nttrack.com/login
 
 ```text
 yourdomain.com
@@ -123,13 +125,14 @@ www.yourdomain.com
 admin.yourdomain.com
 *.yourdomain.com
 ```
-
-The wildcard domain is required because tenant sites use:
+ https://nttrack.com/api/health
+ https://nttrack.com/api/ready
 
 ```text
 {tenant-slug}.yourdomain.com
 ```
 
+ 2. Point `realtime.nttrack.com` to that host.
 Vercel may require domain verification before accepting the wildcard. Follow
 the verification record it displays exactly. Do not guess verification values.
 

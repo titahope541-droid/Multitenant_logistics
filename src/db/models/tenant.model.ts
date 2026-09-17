@@ -19,7 +19,7 @@ export interface TenantContactDetails {
 
 export interface TenantDocument {
   companyName: string;
-  /** Subdomain identifier — `swift.yourplatform.com` → "swift". */
+  /** Subdomain identifier — `swift.nttrack.com` → "swift". */
   slug: string;
   status: TenantStatus;
   contact: TenantContactDetails;

@@ -10,7 +10,7 @@ MongoDB Atlas cluster, Cloudflare in front.
 > process and there are no per-tenant deployments.
 
 ```text
-INTERNET
+   `*.nttrack.com` — to **one** origin. There is no second backend
    │  HTTPS / WSS
    ▼
 CLOUDFLARE  — DNS, wildcard DNS, SSL/TLS, caching (static-ish only)
@@ -81,11 +81,12 @@ SESSION_SECRET=<openssl rand -hex 32 of YOUR OWN>
 LOG_LEVEL=warn
 NEXT_PUBLIC_APP_URL=https://yourplatform.com
 NEXT_PUBLIC_API_BASE_URL=/api/v1
-NEXT_PUBLIC_PLATFORM_DOMAIN=yourplatform.com
+NEXT_PUBLIC_PLATFORM_DOMAIN=nttrack.com
 PLATFORM_HOST_SUFFIXES=             # empty in production (docs/environment.md)
 GEOCODING_BASE_URL=https://nominatim.openstreetmap.org   # or your licensed instance
 GEOCODING_USER_AGENT=meridian-logistics/1.0 (contact: ops@yourplatform.com)
-GEOCODING_CONTACT=ops@yourplatform.com
+GEOCODING_USER_AGENT=meridian-logistics/1.0 (contact: ops@nttrack.com)
+GEOCODING_CONTACT=ops@nttrack.com
 NEXT_PUBLIC_OSM_TILE_URL=https://tile.openstreetmap.org/{z}/{x}/{y}.png
 ```
 
@@ -97,7 +98,8 @@ client code (enforced by layering, docs/environment.md).
 
 Cookies are **host-only** (no `Domain` attribute) — the admin session
 lives on `admin.yourplatform.com`, a tenant admin session on its own
-`{slug}.yourplatform.com`. There is never a shared `.yourplatform.com`
+lives on `admin.nttrack.com`, a tenant admin session on its own
+`{slug}.nttrack.com`. There is never a shared `.nttrack.com`
 cookie: last thing you'd ever want is a tenant host riding the platform
 admin's session. No `COOKIE_DOMAIN` variable exists on purpose.
 
@@ -130,7 +132,7 @@ pm2 monit
 
 ```bash
 sudo cp deploy/nginx/yourplatform.conf /etc/nginx/sites-available/yourplatform.conf
-# edit `yourplatform.com` → your real domain everywhere in that file (server_name + cert paths)
+# edit `nttrack.com` → your real domain everywhere in that file (server_name + cert paths)
 sudo ln -s /etc/nginx/sites-available/yourplatform.conf /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 ```
@@ -155,14 +157,14 @@ challenge path.
 
 The wildcard A record is the entire tenant-subdomain engine (wildcard
 subdomains need at least the Cloudflare **Full** SSL mode; the wildcard
-*free cert* on Cloudflare covers `*.yourplatform.com`).
+*free cert* on Cloudflare covers `*.nttrack.com`).
 3. **SSL/TLS mode**: `Full (strict)`. Strict requires a VALID certificate
 on the origin — issue one on the VPS with Certbot's `nginx` plugin OR add
 a free **Cloudflare Origin Certificate** to `/etc/letsencrypt/...` paths
 in the Nginx file. Never `Flexible` (traffic would be plain from edge to
 origin; Secure cookies would sabotage login).
 4. **Always Use HTTPS**: on. **Cache**: set a page rule/Cache Rule —
-   `yourplatform.com/api/*` → **Bypass cache**, `*yourplatform.com/socket.io/*`
+   `nttrack.com/api/*` → **Bypass cache**, `*nttrack.com/socket.io/*`
    → bypass entirely (WebSockets never cache; caching stale tracking/API
    payloads would show wrong shipments), everything else default. Do not
    cache HTML of tenant sites aggressively (branding changes should show
@@ -231,6 +233,7 @@ not touch MongoDB, so rollbacks never destroy data. Roll FORWARD with
 
 Never hand-insert tenants into MongoDB — the Platform Admin flow owns
 provisioning (atomic): sign in at `admin.yourplatform.com/login` → Tenants
+provisioning (atomic): sign in at `admin.nttrack.com/login` → Tenants
 → New tenant → the 3-step wizard mints tenant + admin + WebsiteConfig in
 one transaction, and reveals the admin's temporary password ONCE.
 Then follow `docs/production-checklist.md` (22 smoke steps incl. package

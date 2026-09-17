@@ -53,7 +53,14 @@ async function main(): Promise<void> {
         );
       }
       const passwordHash = await hashPassword(PLATFORM_ADMIN_PASSWORD);
-      await UserModel.findByIdAndUpdate(existing._id, { passwordHash });
+
+await UserModel.findByIdAndUpdate(existing._id, {
+  name: PLATFORM_ADMIN_NAME.trim(),
+  email: PLATFORM_ADMIN_EMAIL.trim().toLowerCase(),
+  passwordHash,
+});
+
+console.log("seed-platform-admin: existing Platform Admin credentials reset.");
       console.log("seed-platform-admin: existing Platform Admin password reset.");
       return;
     }

@@ -18,9 +18,9 @@ Core rules (locked):
 
 | Host                                   | Surface                        |
 | -------------------------------------- | ------------------------------ |
-| `yourplatform.com`, `www.`             | platform root (developer portal) |
-| `admin.yourplatform.com`               | platform admin console (redirect `/admin`) |
-| `{slug}.yourplatform.com`              | tenant website                 |
+| `nttrack.com`, `www.`             | platform root (developer portal) |
+| `admin.nttrack.com`               | platform admin console (redirect `/admin`) |
+| `{slug}.nttrack.com`              | tenant website                 |
 | `localhost`, `127.0.0.1`               | platform root (local dev)      |
 | `{slug}.localhost`                     | tenant website (local dev)     |
 | anything else (incl. multi-level subs) | safe "Website Not Found"       |
@@ -32,7 +32,7 @@ the generic not-found surface. Pure host parsing is unit-tested
 **Preview/staging hosts:** `PLATFORM_HOST_SUFFIXES` (env) lists extra
 suffixes that serve the PLATFORM surface only — they can never resolve a
 tenant. While `NEXT_PUBLIC_PLATFORM_DOMAIN` is still the placeholder
-"yourplatform.com", the managed preview host suffix is auto-included so
+"nttrack.com", the managed preview host suffix is auto-included so
 previews land on the developer portal instead of "Website Not Found".
 Tenancy behavior behind real DNS (the production model) is unchanged.
 

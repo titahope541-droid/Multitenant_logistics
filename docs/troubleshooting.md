@@ -21,7 +21,7 @@ Symptom → cause → where to look → fix. Start with the logs —
 | Symptom | Cause | Fix |
 | ------- | ----- | --- |
 | Every subdomain shows developer portal | host matches a preview suffix platform list | clear `PLATFORM_HOST_SUFFIXES` in production `.env` (it is empty in production) |
-| Tenant site shows "Website Not Found" | slug doesn't exist, or multi-label host, or DNS missing wildcard | verify tenant slug in `/admin/tenants`; wildcard A record `*` in Cloudflare; Nginx `server_name .yourplatform.com` |
+| Tenant site shows "Website Not Found" | slug doesn't exist, or multi-label host, or DNS missing wildcard | verify tenant slug in `/admin/tenants`; wildcard A record `*` in Cloudflare; Nginx `server_name .nttrack.com` |
 | `invalid tracking ID` on a valid ID | ID pattern didn't match (length/charset) | IDs are uppercase alnum+dash, 3–64 chars; recheck the copied value end-to-end |
 | `TENANT_NOT_FOUND` from the tracking API | Host header lost/mangled upstream | Nginx proxy_set_header Host $host must be present; Cloudflare passes Host by default |
 
@@ -48,8 +48,8 @@ Symptom → cause → where to look → fix. Start with the logs —
 
 ## SSL
 
-| Cloudflare `526` (invalid origin cert) | origin lacks a valid cert under Full (strict) | run `sudo certbot --nginx -d yourplatform.com -d '*.yourplatform.com'` (or install the Cloudflare Origin Cert at the paths in the Nginx file), `sudo nginx -t && sudo systemctl reload nginx` |
-| Browser says insecure only on subdomain | wildcard certificate missing | certbot as above covers `*`; single-name certs won't — re-issue with `*.yourplatform.com` included |
+| Cloudflare `526` (invalid origin cert) | origin lacks a valid cert under Full (strict) | run `sudo certbot --nginx -d nttrack.com -d '*.nttrack.com'` (or install the Cloudflare Origin Cert at the paths in the Nginx file), `sudo nginx -t && sudo systemctl reload nginx` |
+| Browser says insecure only on subdomain | wildcard certificate missing | certbot as above covers `*`; single-name certs won't — re-issue with `*.nttrack.com` included |
 
 ## Recovery quick map
 

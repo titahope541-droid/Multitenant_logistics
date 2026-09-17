@@ -10,7 +10,7 @@
 export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
- * Tenant slug — the subdomain identifier: `swift.yourplatform.com` → "swift".
+ * Tenant slug — the subdomain identifier: `swift.nttrack.com` → "swift".
  * Lowercase alphanumeric segments joined by single hyphens.
  */
 export const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;

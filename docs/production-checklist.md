@@ -25,11 +25,11 @@ phase is not "deployed" until every box ticks on the live domain.
 ## B · Production smoke test (the 22 steps)
 
 ```text
-[ ]  1 https://yourplatform.com loads the developer portal (or your production landing)
-[ ]  2 https://admin.yourplatform.com/admin loads (login visible)
+[ ]  1 https://nttrack.com loads the developer portal (or your production landing)
+[ ]  2 https://admin.nttrack.com/admin loads (login visible)
 [ ]  3 Platform admin login succeeds (cookie appears; HttpOnly checked)
 [ ]  4 Create demo tenant via the wizard (3 steps, one admin, config initialized)
-[ ]  5 https://swift.yourplatform.com shows the TENANT'S branded site (no platform branding)
+[ ]  5 https://swift.nttrack.com shows the TENANT'S branded site (no platform branding)
 [ ]  6 (dev-local equivalent: swift.localhost:<port> works too)
 [ ]  7 Tenant admin login succeeds at /login, /dashboard opens
 [ ]  8 Create a package; tracking ID is auto-minted (never typed)

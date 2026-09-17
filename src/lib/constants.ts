@@ -8,8 +8,8 @@ export const PLATFORM = {
   name: "Meridian",
   codename: "MERIDIAN",
   tagline: "One platform. Every fleet.",
-  /** Placeholder until the production domain exists (V1 = subdomains only). */
-  domainPlaceholder: "yourplatform.com",
+  /** Production platform domain (V1 = subdomains only). */
+  domainPlaceholder: "nttrack.com",
   /** Reserved subdomain for the platform owner control plane. */
   platformAdminSubdomain: "admin",
   phase: 1,

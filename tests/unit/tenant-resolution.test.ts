@@ -6,7 +6,7 @@
 import { describe, expect, it } from "vitest";
 import { parseHost } from "@/server/services/tenant-resolution.service";
 
-const DOMAIN = "yourplatform.com";
+const DOMAIN = "nttrack.com";
 
 describe("parseHost", () => {
   it("maps platform roots to the platform surface", () => {
@@ -44,7 +44,7 @@ describe("parseHost", () => {
   });
 
   it("normalizes case and tolerates empty hosts", () => {
-    expect(parseHost("SWIFT.YOURPLATFORM.COM", DOMAIN)).toEqual({ kind: "tenant-host", slug: "swift" });
+    expect(parseHost("SWIFT.NTTRACK.COM", DOMAIN)).toEqual({ kind: "tenant-host", slug: "swift" });
     expect(parseHost("", DOMAIN)).toEqual({ kind: "platform" });
     expect(parseHost(null, DOMAIN)).toEqual({ kind: "platform" });
   });

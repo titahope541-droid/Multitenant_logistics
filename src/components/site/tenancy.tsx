@@ -2,7 +2,7 @@ import { KeyRound, PackageSearch, ShieldCheck, UserRound, Users, Workflow } from
 import { SectionHeading } from "@/components/site/section-heading";
 
 const RESOLUTION_STEPS = [
-  { label: "HOST", value: "swift.yourplatform.com" },
+  { label: "HOST", value: "swift.nttrack.com" },
   { label: "SUBDOMAIN", value: `"swift" → tenants.slug` },
   { label: "CONTEXT", value: "{ tenantId } attached server-side" },
   { label: "SCOPE", value: "every query filter: { tenantId }" },
@@ -67,7 +67,7 @@ export function Tenancy() {
             <div className="border-t border-line px-5 py-4">
               <p className="text-xs leading-5 text-dim">
                 Reserved:{" "}
-                <code className="font-mono text-paper/80">admin.yourplatform.com</code> — the
+                <code className="font-mono text-paper/80">admin.nttrack.com</code> — the
                 platform owner control plane. V1 supports subdomains only.
               </p>
             </div>

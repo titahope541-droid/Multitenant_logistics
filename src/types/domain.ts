@@ -92,7 +92,7 @@ export interface TenantContact {
  *  configuration lives separately in WebsiteConfig. */
 export interface Tenant {
   id: string;
-  /** Subdomain slug: `swift.yourplatform.com` → "swift". Globally unique. */
+  /** Subdomain slug: `swift.nttrack.com` → "swift". Globally unique. */
   slug: string;
   companyName: string;
   status: TenantStatus;

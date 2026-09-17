@@ -72,7 +72,7 @@ export function getServerConfig(): ServerConfig {
     mongodbUri: process.env.MONGODB_URI ?? null,
     sessionSecret: process.env.SESSION_SECRET ?? null,
     logLevel: resolveLogLevel(),
-    platformDomain: process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "yourplatform.com",
+    platformDomain: process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "nttrack.com",
     platformHostSuffixes: (process.env.PLATFORM_HOST_SUFFIXES ?? "")
       .split(",")
       .map((suffix) => suffix.trim().toLowerCase())

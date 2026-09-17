@@ -32,7 +32,7 @@ Server-only variables never get the prefix and are only read inside
 | ----------------------------- | ---------------------------------------- | -------------------- |
 | `NEXT_PUBLIC_APP_URL`         | absolute origin for links/SEO            | `http://localhost:3000` |
 | `NEXT_PUBLIC_API_BASE_URL`    | API base path for the browser client     | `/api/v1`            |
-| `NEXT_PUBLIC_PLATFORM_DOMAIN` | placeholder platform domain (subdomains) | `yourplatform.com`   |
+| `NEXT_PUBLIC_PLATFORM_DOMAIN` | platform domain (subdomains) | `nttrack.com`   |
 
 ---
 
@@ -73,9 +73,9 @@ tenant host-resolution is documented for Phase 4
 | `GEOCODING_USER_AGENT` | server | no | identified UA incl. contact |
 | `GEOCODING_CONTACT` | server | no | ops contact (forwarded to Nominatim policy) |
 | `PLATFORM_HOST_SUFFIXES` | server | no | **EMPTY in production** (previews only) |
-| `NEXT_PUBLIC_APP_URL` | public bundle | no | `https://yourplatform.com` |
+| `NEXT_PUBLIC_APP_URL` | public bundle | no | `https://nttrack.com` |
 | `NEXT_PUBLIC_API_BASE_URL` | public bundle | no | `/api/v1` (same-origin) |
-| `NEXT_PUBLIC_PLATFORM_DOMAIN` | public bundle | no | `yourplatform.com` — drives tenant links AND host resolution |
+| `NEXT_PUBLIC_PLATFORM_DOMAIN` | public bundle | no | `nttrack.com` — drives tenant links AND host resolution |
 | `NEXT_PUBLIC_OSM_TILE_URL` | public bundle | no | tile template URL |
 
 Cookies: intentionally NO `COOKIE_DOMAIN` variable — cookies are

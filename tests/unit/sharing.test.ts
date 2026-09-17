@@ -11,8 +11,8 @@ const PARTS = { slug: "swift", trackingId: "PKG-SWI-20260909-K7Q2X9" };
 describe("buildTrackingUrl", () => {
   it("builds production tenant URLs on the platform domain", () => {
     expect(
-      buildTrackingUrl(PARTS, { platformDomain: "yourplatform.com", isLocal: false }),
-    ).toBe("https://swift.yourplatform.com/track?trackingId=PKG-SWI-20260909-K7Q2X9");
+      buildTrackingUrl(PARTS, { platformDomain: "nttrack.com", isLocal: false }),
+    ).toBe("https://swift.nttrack.com/track?trackingId=PKG-SWI-20260909-K7Q2X9");
   });
 
   it("builds local development URLs on {slug}.localhost with port", () => {
@@ -27,7 +27,7 @@ describe("buildTrackingUrl", () => {
   it("URL-encodes the tracking ID and never carries tenantId or internals", () => {
     const url = buildTrackingUrl(
       { slug: "apex", trackingId: "PKG-ODD ID/+2026" },
-      { platformDomain: "yourplatform.com", isLocal: false },
+      { platformDomain: "nttrack.com", isLocal: false },
     );
     expect(url).toContain("trackingId=PKG-ODD%20ID%2F%2B2026");
     expect(url).not.toContain("tenantId=");
@@ -47,7 +47,7 @@ describe("buildTrackingUrl", () => {
 
 describe("buildWhatsAppShareUrl", () => {
   it("builds a wa.me URL with the encoded professional message", () => {
-    const trackingUrl = "https://swift.yourplatform.com/track?trackingId=PKG-SWI-20260909-K7Q2X9";
+    const trackingUrl = "https://swift.nttrack.com/track?trackingId=PKG-SWI-20260909-K7Q2X9";
     const shareUrl = buildWhatsAppShareUrl({
       companyName: "Swift Logistics",
       trackingId: "PKG-SWI-20260909-K7Q2X9",
@@ -66,7 +66,7 @@ describe("buildWhatsAppShareUrl", () => {
     const shareUrl = buildWhatsAppShareUrl({
       companyName: "R&D Express & Co.",
       trackingId: "PKG-RND-1-AAAAAA",
-      trackingUrl: "https://rnd.yourplatform.com/track?trackingId=PKG-RND-1-AAAAAA",
+      trackingUrl: "https://rnd.nttrack.com/track?trackingId=PKG-RND-1-AAAAAA",
     });
     // raw ampersand must never break the query string
     expect(shareUrl.split("text=")).toHaveLength(2);
@@ -78,7 +78,7 @@ describe("buildWhatsAppShareUrl", () => {
     const shareUrl = buildWhatsAppShareUrl({
       companyName: "Swift Logistics",
       trackingId: "PKG-SWI-20260909-K7Q2X9",
-      trackingUrl: "https://swift.yourplatform.com/track?trackingId=PKG-SWI-20260909-K7Q2X9",
+      trackingUrl: "https://swift.nttrack.com/track?trackingId=PKG-SWI-20260909-K7Q2X9",
     });
     const message = decodeURIComponent(shareUrl);
     expect(message).not.toContain("tenantId");

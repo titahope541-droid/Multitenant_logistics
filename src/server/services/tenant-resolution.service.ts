@@ -5,9 +5,9 @@
  *
  * Host model (V1, subdomains only — no custom domains):
  *
- *   yourplatform.com / www   → platform root (the developer portal)
- *   admin.yourplatform.com   → platform admin control plane
- *   {slug}.yourplatform.com  → tenant website
+ *   nttrack.com / www         → platform root (the developer portal)
+ *   admin.nttrack.com         → platform admin control plane
+ *   {slug}.nttrack.com        → tenant website
  *   localhost / 127.0.0.1    → platform root (local dev)
  *   {slug}.localhost         → tenant website (local dev — no DNS needed)
  *   anything else            → unknown → safe "Website Not Found"
@@ -93,7 +93,7 @@ export async function resolveTenantFromHostHeader(hostHeader: string | null): Pr
   // surface (documented in docs/tenant-websites.md §preview-hosts).
   const suffixes = [
     ...config.platformHostSuffixes,
-    ...(config.platformDomain === "yourplatform.com" ? [".e2b.app"] : []),
+    ...(config.platformDomain === "nttrack.com" ? [".e2b.app"] : []),
   ];
   const parsed = parseHost(hostHeader, config.platformDomain, suffixes);
 

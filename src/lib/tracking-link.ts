@@ -32,7 +32,7 @@ function configuredDomain(options: TrackingUrlOptions): string {
   return (
     options.platformDomain ??
     process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ??
-    "yourplatform.com"
+    "nttrack.com"
   );
 }
 
@@ -40,7 +40,7 @@ function isLocalEnvironment(domain: string, options: TrackingUrlOptions): boolea
   if (options.isLocal !== undefined) return options.isLocal;
   // The placeholder domain can never carry a real production tenant site;
   // in development `*.localhost` serves tenants instead (docs/development.md).
-  return domain === "yourplatform.com" && process.env.NODE_ENV !== "production";
+  return domain === "nttrack.com" && process.env.NODE_ENV !== "production";
 }
 
 function localPort(options: TrackingUrlOptions): string {
@@ -76,7 +76,7 @@ export function buildTrackingUrl(
  * links map to `{slug}.localhost` on the same port automatically.
  */
 export function buildTrackingUrlFromWindow(parts: TrackingUrlParts): string {
-  const domain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "yourplatform.com";
+  const domain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ?? "nttrack.com";
   if (typeof window === "undefined") return buildTrackingUrl(parts);
   const hostname = window.location.hostname;
   const isLocal =

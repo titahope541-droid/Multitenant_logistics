@@ -14,9 +14,9 @@ Every logistics company (a **tenant**) gets its own branded space under a
 subdomain of the platform domain:
 
 ```text
-swift.yourplatform.com      ← tenant "Swift Logistics"
-apex.yourplatform.com       ← tenant "Apex Freight"
-admin.yourplatform.com      ← the platform owner's control plane
+swift.nttrack.com      ← tenant "Swift Logistics"
+apex.nttrack.com       ← tenant "Apex Freight"
+admin.nttrack.com      ← the platform owner's control plane
 ```
 
 Each tenant receives, from the same shared application and shared database:

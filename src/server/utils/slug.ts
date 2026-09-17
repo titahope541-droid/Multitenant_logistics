@@ -1,7 +1,7 @@
 /**
  * Tenant slug utilities.
  *
- * The slug is the tenant's subdomain identity: `swift.yourplatform.com`.
+ * The slug is the tenant's subdomain identity: `swift.nttrack.com`.
  * Rules (docs/tenant-management.md §slug): lowercase, URL-safe
  * alphanumeric segments joined by single hyphens, unique platform-wide,
  * and never one of the reserved platform names.

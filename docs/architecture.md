@@ -62,7 +62,7 @@ the same application and the same database as every other tenant.
 ### Tenant identification (concept — full resolution in Phase 4)
 
 ```text
-swift.yourplatform.com
+swift.nttrack.com
  └─┬─┘ └───┬──────────┘
    │        └── the platform domain (placeholder; V1 = subdomains ONLY)
    └────────── the tenant slug → resolves to tenants.slug → tenants.id
@@ -71,14 +71,14 @@ swift.yourplatform.com
 Conceptual flow:
 
 ```text
-request Host: swift.yourplatform.com
+request Host: swift.nttrack.com
    → extract subdomain "swift"
    → look up tenant by slug
    → attach { tenantId, tenantConfig } to the request context
    → every downstream query is automatically scoped to that tenantId
 ```
 
-`admin.yourplatform.com` is reserved for the **platform admin control plane**
+`admin.nttrack.com` is reserved for the **platform admin control plane**
 and resolves to no tenant.
 
 In Phase 1, local development has no wildcard subdomains, so the platform runs

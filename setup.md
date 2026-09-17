@@ -43,7 +43,7 @@ Only **two** values are mandatory:
 
 Everything else keeps working with the template defaults
 (`NEXT_PUBLIC_APP_URL=http://localhost:3000`,
-`NEXT_PUBLIC_PLATFORM_DOMAIN=yourplatform.com`,
+`NEXT_PUBLIC_PLATFORM_DOMAIN=nttrack.com`,
 `NEXT_PUBLIC_API_BASE_URL=/api/v1`, `LOG_LEVEL=info`, public Nominatim
 geocoding defaults, `PLATFORM_HOST_SUFFIXES=` empty).
 
